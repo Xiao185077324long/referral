@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>小翼龙 Token</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐉</text></svg>">
     <style>
         * {
             margin: 0;
@@ -909,32 +910,68 @@
         }
         
         // ==================== Web3连接 ====================
+        
+        // 获取可用的 Ethereum 提供者（兼容多个钱包插件）
+        function getEthereumProvider() {
+            // 优先使用 MetaMask
+            if (window.ethereum?.isMetaMask) {
+                return window.ethereum;
+            }
+            // 尝试其他提供者
+            if (window.ethereum) {
+                return window.ethereum;
+            }
+            // TokenPocket 等
+            if (window.web3?.currentProvider) {
+                return window.web3.currentProvider;
+            }
+            return null;
+        }
+        
         async function connectWallet() {
-            if (typeof window.ethereum === 'undefined') {
-                showToast('请安装 MetaMask 钱包', 'error');
+            const ethereum = getEthereumProvider();
+            
+            if (!ethereum) {
+                showToast('请安装 MetaMask、TokenPocket 或其他 Web3 钱包', 'error');
                 return;
             }
             
             try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                if (accounts.length === 0) throw new Error('未授权钱包');
+                // 尝试获取 accounts
+                let accounts;
+                try {
+                    accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                } catch (e) {
+                    // 有些钱包用不同方法
+                    if (ethereum.enable) {
+                        accounts = await ethereum.enable();
+                    } else {
+                        throw e;
+                    }
+                }
+                
+                if (!accounts || accounts.length === 0) throw new Error('未授权钱包');
                 
                 account = accounts[0];
-                web3 = new Web3(window.ethereum);
+                web3 = new Web3(ethereum);
                 mainContract = new web3.eth.Contract(MAIN_ABI, CONFIG.MAIN_CONTRACT);
                 
                 // 检查网络
-                const chainId = await web3.eth.getChainId();
-                if (Number(chainId) !== CONFIG.CHAIN_ID) {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: `0x${CONFIG.CHAIN_ID.toString(16)}` }]
-                        });
-                    } catch (switchError) {
-                        if (switchError.code !== 4902) throw switchError;
-                        showToast('请手动切换到 BSC 主网', 'error');
+                try {
+                    const chainId = await web3.eth.getChainId();
+                    if (Number(chainId) !== CONFIG.CHAIN_ID) {
+                        try {
+                            await ethereum.request({
+                                method: 'wallet_switchEthereumChain',
+                                params: [{ chainId: `0x${CONFIG.CHAIN_ID.toString(16)}` }]
+                            });
+                        } catch (switchError) {
+                            if (switchError.code !== 4902) throw switchError;
+                            showToast('请手动切换到 BSC 主网', 'error');
+                        }
                     }
+                } catch (e) {
+                    console.warn('检查网络失败:', e);
                 }
                 
                 // 更新UI
@@ -947,16 +984,21 @@
                 
                 await refreshData();
                 
-                window.ethereum.on('accountsChanged', (accounts) => {
-                    if (accounts.length === 0) disconnectWallet();
+                // 监听账户变化
+                ethereum.on('accountsChanged', (accounts) => {
+                    if (!accounts || accounts.length === 0) disconnectWallet();
                     else { account = accounts[0]; refreshData(); }
                 });
                 
-                window.ethereum.on('chainChanged', () => window.location.reload());
+                ethereum.on('chainChanged', () => window.location.reload());
                 
             } catch (error) {
                 console.error('连接失败:', error);
-                showToast(error.message || '连接失败', 'error');
+                let msg = error.message || '连接失败';
+                if (msg.includes('User rejected') || msg.includes('用户取消')) {
+                    msg = '用户取消连接';
+                }
+                showToast(msg, 'error');
             }
         }
         
