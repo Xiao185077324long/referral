@@ -909,6 +909,13 @@
             document.getElementById('tab-' + tabName).classList.add('active');
         }
         
+        // ==================== URL参数解析 ====================
+        // 获取URL中的推荐人参数
+        function getReferrerFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('ref');
+        }
+        
         // ==================== Web3连接 ====================
         
         // 获取可用的 Ethereum 提供者（兼容多个钱包插件）
@@ -983,6 +990,30 @@
                 document.getElementById('myAddress').value = account;
                 
                 await refreshData();
+                
+                // 检查是否需要自动绑定推荐人
+                const pendingRef = getReferrerFromURL();
+                if (pendingRef && web3.utils.isAddress(pendingRef)) {
+                    // 检查是否已绑定
+                    try {
+                        const myReferrer = await mainContract.methods.referrer(account).call();
+                        if (!myReferrer || myReferrer === '0x0000000000000000000000000000000000000000') {
+                            if (pendingRef.toLowerCase() !== account.toLowerCase()) {
+                                showToast('正在自动绑定推荐人...', 'success');
+                                setTimeout(async () => {
+                                    try {
+                                        await mainContract.methods.bindReferrer(pendingRef).send({ from: account });
+                                        showToast('推荐人绑定成功！', 'success');
+                                    } catch (e) {
+                                        console.log('自动绑定失败:', e);
+                                    }
+                                }, 500);
+                            }
+                        }
+                    } catch (e) {
+                        console.log('检查推荐人状态失败:', e);
+                    }
+                }
                 
                 // 监听账户变化
                 ethereum.on('accountsChanged', (accounts) => {
