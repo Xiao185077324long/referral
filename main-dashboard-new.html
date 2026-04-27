@@ -544,7 +544,9 @@
     <div class="container">
         <!-- 头部 -->
         <div class="header">
-            <img src="logo.png" alt="小翼龙" class="logo-img">
+            <div class="logo-img" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%;">
+                <span style="font-size: 40px;">🐉</span>
+            </div>
             <h1>小翼龙 Token</h1>
             <p class="subtitle">XYL Token Dashboard</p>
         </div>
@@ -1041,7 +1043,6 @@
                 document.getElementById('targetForPhase').textContent = formatToken(currentTarget - prevTarget);
                 
                 // 销毁数据
-                const burned = await mainContract.methods.getBurnedAmount().call();
                 const circulating = await mainContract.methods.getCirculatingSupply().call();
                 document.getElementById('burnedAmount').textContent = formatToken(burned);
                 document.getElementById('circulating').textContent = formatToken(circulating);
