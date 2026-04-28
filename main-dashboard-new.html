@@ -705,6 +705,24 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- 一键领取奖励 -->
+                <div class="card">
+                    <div class="card-title">推广奖励领取</div>
+                    <div class="input-group">
+                        <label class="input-label">我的下级地址（逗号分隔多个）</label>
+                        <textarea class="input-field" id="downlineInput" rows="3" placeholder="输入下级地址，多个用逗号分隔"></textarea>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="loadMyDownlines()">自动加载下级</button>
+                        <button class="btn btn-green" onclick="queryClaimable()">查询可领取</button>
+                    </div>
+                    <div id="claimableList" style="margin-top: 16px;"></div>
+                    <div class="btn-group" style="margin-top: 12px;">
+                        <button class="btn btn-yellow" onclick="claimAll()">一键领取</button>
+                    </div>
+                    <div class="error-box" id="claimError"></div>
+                </div>
             </div>
             
             <!-- 我的Tab -->
@@ -805,7 +823,11 @@
             {"inputs":[{"name":"user","type":"address"}],"name":"getUserDEXBuyInfo","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"bool"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"name":"user","type":"address"}],"name":"checkHoldQualified","outputs":[{"type":"bool"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"name":"refAddr","type":"address"}],"name":"bindReferrer","outputs":[],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[],"name":"lockContract","outputs":[{"type":"address"}],"stateMutability":"view","type":"function"}
+            {"inputs":[],"name":"lockContract","outputs":[{"type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"name":"up","type":"address"},{"name":"downlines","type":"address[]"}],"name":"getClaimableDownlines","outputs":[{"type":"address[]"},{"type":"uint256[]"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"name":"user","type":"address"}],"name":"claimReward","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"name":"up","type":"address"},{"name":"user","type":"address"},{"name":"phase","type":"uint8"}],"name":"cumulativeClaimedByDownline","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"name":"up","type":"address"}],"name":"lastClaimTime","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"}
         ];
         
         // ==================== 锁仓合约ABI ====================
@@ -1163,6 +1185,152 @@
                 }
             } catch (error) {
                 console.error('获取锁仓数据失败:', error);
+            }
+        }
+        
+        // ==================== 推广奖励领取 ====================
+        let myDownlines = [];  // 存储下级地址列表
+        let claimableData = [];  // 存储可领取数据
+        
+        // 自动加载下级（通过查询ReferrerBound事件）
+        async function loadMyDownlines() {
+            if (!mainContract || !account) return;
+            
+            try {
+                showToast('正在加载下级列表...', 'success');
+                
+                // 查询ReferrerBound事件，找到所有以当前账户为推荐人的记录
+                const events = await mainContract.getPastEvents('ReferrerBound', {
+                    filter: { referrer: account },
+                    fromBlock: 0,
+                    toBlock: 'latest'
+                });
+                
+                myDownlines = events.map(e => e.returnValues.user);
+                
+                // 去重
+                myDownlines = [...new Set(myDownlines)];
+                
+                if (myDownlines.length === 0) {
+                    showToast('未找到下级，请手动输入', 'error');
+                    return;
+                }
+                
+                // 更新输入框
+                document.getElementById('downlineInput').value = myDownlines.join(', ');
+                showToast(`已加载 ${myDownlines.length} 个下级`, 'success');
+                
+            } catch (error) {
+                console.error('加载下级失败:', error);
+                showToast('加载失败，请手动输入下级地址', 'error');
+            }
+        }
+        
+        // 查询可领取奖励
+        async function queryClaimable() {
+            if (!mainContract || !account) return;
+            
+            // 获取下级列表
+            const input = document.getElementById('downlineInput').value.trim();
+            if (!input) {
+                showError('请输入下级地址', 'claimError');
+                return;
+            }
+            
+            const downlines = input.split(',').map(addr => addr.trim()).filter(addr => addr);
+            
+            // 验证地址
+            const validDownlines = [];
+            for (const addr of downlines) {
+                if (web3.utils.isAddress(addr)) {
+                    validDownlines.push(addr);
+                }
+            }
+            
+            if (validDownlines.length === 0) {
+                showError('请输入有效的钱包地址', 'claimError');
+                return;
+            }
+            
+            try {
+                showToast('正在查询可领取奖励...', 'success');
+                
+                // 调用合约查询可领取的下级
+                const result = await mainContract.methods.getClaimableDownlines(account, validDownlines).call();
+                
+                const claimableAddresses = result[0];
+                const claimableAmounts = result[1];
+                const count = Number(result[2]);
+                
+                if (count === 0) {
+                    document.getElementById('claimableList').innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.5);padding:12px;">暂无可领取奖励</div>';
+                    showToast('暂无可领取奖励', 'error');
+                    return;
+                }
+                
+                // 显示可领取列表
+                let html = '<div style="color:rgba(255,255,255,0.9);font-size:14px;font-weight:600;margin-bottom:8px;">可领取奖励列表</div>';
+                let totalReward = BigInt(0);
+                
+                for (let i = 0; i < count; i++) {
+                    const addr = claimableAddresses[i];
+                    const amount = BigInt(claimableAmounts[i]);
+                    totalReward += amount;
+                    
+                    html += `
+                        <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+                            <div>
+                                <div style="font-size:12px;color:rgba(255,255,255,0.6);">${addr.slice(0,6)}...${addr.slice(-4)}</div>
+                            </div>
+                            <div style="font-size:14px;font-weight:600;color:#00d26a;">${formatToken(amount.toString())} XYL</div>
+                        </div>
+                    `;
+                }
+                
+                html += `<div style="text-align:center;padding:8px;color:#00d26a;font-weight:600;">总计可领取: ${formatToken(totalReward.toString())} XYL</div>`;
+                
+                document.getElementById('claimableList').innerHTML = html;
+                showToast(`找到 ${count} 个可领取奖励`, 'success');
+                
+                // 保存数据供一键领取使用
+                claimableData = claimableAddresses.slice(0, count);
+                
+            } catch (error) {
+                console.error('查询失败:', error);
+                let msg = '查询失败';
+                if (error.message.includes('Claim once per day')) msg = '今天已经领取过奖励，请明天再来';
+                showError(msg, 'claimError');
+            }
+        }
+        
+        // 一键领取所有奖励
+        async function claimAll() {
+            if (!mainContract || !account) return;
+            if (!claimableData || claimableData.length === 0) {
+                showError('请先查询可领取奖励', 'claimError');
+                return;
+            }
+            
+            try {
+                showToast('正在领取奖励...', 'success');
+                
+                // 循环领取（每天只能领取一次，所以只领取第一个）
+                const user = claimableData[0];
+                
+                await mainContract.methods.claimReward(user).send({ from: account });
+                
+                showToast('领取成功！今天已领取过奖励，明天可以继续领取', 'success');
+                
+                // 刷新数据
+                await queryClaimable();
+                
+            } catch (error) {
+                console.error('领取失败:', error);
+                let msg = '领取失败';
+                if (error.message.includes('Claim once per day')) msg = '今天已经领取过奖励，请明天再来';
+                else if (error.message.includes('user rejected')) msg = '用户取消签名';
+                else if (error.message.includes('NothingToClaim')) msg = '没有可领取的奖励';
+                showError(msg, 'claimError');
             }
         }
         
