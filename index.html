@@ -137,6 +137,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
+            width: 100%;
         }
         
         .lock-card {
@@ -144,6 +145,7 @@
             border-radius: 12px;
             padding: 14px;
             text-align: center;
+            box-sizing: border-box;
         }
         
         .lock-card.private {
@@ -663,13 +665,18 @@
                             <div class="lock-label">私募方释放总量</div>
                             <div class="lock-value" id="privateReleased">--</div>
                         </div>
-                        
-                        <div class="lock-card.project">
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">项目方数据</div>
+                    <div class="lock-grid">
+                        <div class="lock-card project">
                             <div class="lock-label">项目方锁仓总量</div>
                             <div class="lock-value" id="projectLockTotal">--</div>
                         </div>
                         
-                        <div class="lock-card.project">
+                        <div class="lock-card project">
                             <div class="lock-label">项目方释放总量</div>
                             <div class="lock-value" id="projectReleased">--</div>
                         </div>
