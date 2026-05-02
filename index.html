@@ -704,22 +704,17 @@
                 
                 <div class="card">
                     <div class="card-title">推广奖励领取</div>
-                    <div class="input-group">
-                        <label class="input-label">下级地址</label>
-                        <input type="text" class="input-field" id="downlineAddress" placeholder="输入下级钱包地址">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <span class="data-label">我的下级列表</span>
+                        <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;" onclick="loadDownlines()">刷新</button>
                     </div>
-                    <div class="btn-group">
-                        <button class="btn btn-green" onclick="claimReward()">领取奖励</button>
-                        <button class="btn btn-yellow" onclick="autoClaimAll()">一键领取所有</button>
-                    </div>
-                    <div class="error-box" id="claimError"></div>
+                    <div id="downlineList"></div>
                     
                     <div style="margin-top: 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <span class="data-label">我的下级列表</span>
-                            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="loadDownlines()">刷新</button>
+                        <button class="btn btn-green" onclick="autoClaimAll()">一键领取</button>
+                        <div style="margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.5);">
+                            <span id="lastClaimTime">上次领取时间: --</span>
                         </div>
-                        <div id="downlineList"></div>
                     </div>
                     
                     <div id="claimLog" style="margin-top: 16px; display: none;">
@@ -950,6 +945,12 @@
                 updateStatus('connected', account.slice(0,6) + '...' + account.slice(-4));
                 document.getElementById('myAddress').value = account;
                 
+                const savedClaimTime = localStorage.getItem('xyl_last_claim');
+                if (savedClaimTime) {
+                    lastClaimTime = parseInt(savedClaimTime);
+                    document.getElementById('lastClaimTime').textContent = `上次领取时间: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
+                }
+                
                 await refreshData();
                 
                 const pendingRef = getReferrerFromURL();
@@ -1144,6 +1145,8 @@
             }
         }
         
+        let lastClaimTime = 0;
+        
         async function loadDownlines() {
             if (!mainContract) return;
             
@@ -1198,61 +1201,42 @@
             }
         }
         
-        async function claimReward() {
-            const downlineAddr = document.getElementById('downlineAddress').value.trim();
+        async function autoClaimAll() {
+            if (!mainContract) return;
             
-            if (!web3.utils.isAddress(downlineAddr)) {
-                showError('请输入有效的钱包地址', 'claimError');
+            const COOLDOWN_HOURS = 24;
+            const now = Date.now();
+            
+            if (lastClaimTime > 0 && (now - lastClaimTime) < (COOLDOWN_HOURS * 60 * 60 * 1000)) {
+                const remaining = Math.ceil((lastClaimTime + COOLDOWN_HOURS * 60 * 60 * 1000 - now) / (60 * 1000));
+                showToast(`请等待 ${remaining} 分钟后再领取`, 'error');
                 return;
             }
             
-            try {
-                showToast('正在领取奖励...', 'success');
-                
-                const currentPhase = await mainContract.methods.currentPhase().call();
-                const tierClaimed = await mainContract.methods.tierClaimed(account, downlineAddr, currentPhase).call();
-                
-                let claimed = false;
-                for (let tierId = 0; tierId < 3; tierId++) {
-                    if ((tierClaimed & (1 << tierId)) === 0) {
-                        try {
-                            await mainContract.methods.claimReward(downlineAddr, tierId).send({ from: account });
-                            claimed = true;
-                            showToast(`档${tierId + 1}奖励领取成功！`, 'success');
-                        } catch (e) {
-                            console.log(`领取档${tierId + 1}失败:`, e.message);
-                        }
-                    }
-                }
-                
-                if (!claimed) {
-                    showToast('没有可领取的奖励', 'error');
-                }
-                
-                loadDownlines();
-            } catch (error) {
-                console.error('领取失败:', error);
-                let msg = '领取失败';
-                if (error.message.includes('user rejected')) msg = '用户取消签名';
-                showError(msg, 'claimError');
+            if (!confirm('确认要一键领取所有奖励吗？\n\n注意：\n- 每24小时只能领取一次\n- 将自动遍历所有下级\n- 可能需要多笔交易')) {
+                return;
             }
-        }
-        
-        async function autoClaimAll() {
-            if (!mainContract) return;
             
             document.getElementById('claimLog').style.display = 'block';
             document.getElementById('logContent').innerHTML = '';
             
             try {
                 const downlines = await mainContract.methods.downlines(account).call();
+                
+                if (downlines.length === 0) {
+                    addLog('没有下级可领取', 'info');
+                    return;
+                }
+                
                 const currentPhase = await mainContract.methods.currentPhase().call();
                 const myHold = await mainContract.methods.getCurrentPhaseNetHold(account).call();
                 
                 let successCount = 0;
                 let failCount = 0;
+                let claimableCount = 0;
                 
-                addLog('开始自动领取奖励...', 'info');
+                addLog('开始一键领取奖励...', 'info');
+                addLog(`当前阶段: ${currentPhase}, 下级数量: ${downlines.length}`, 'info');
                 
                 for (const downline of downlines) {
                     const tierClaimed = await mainContract.methods.tierClaimed(account, downline, currentPhase).call();
@@ -1264,6 +1248,7 @@
                         const tier = await mainContract.methods.phaseTiers(currentPhase, tierId).call();
                         if (Number(downHold) < Number(tier.downMin) || Number(myHold) < Number(tier.upMin)) continue;
                         
+                        claimableCount++;
                         addLog(`尝试领取 ${downline.slice(0,6)}...${downline.slice(-4)} 档${tierId + 1}`, 'info');
                         
                         try {
@@ -1271,15 +1256,28 @@
                             addLog(`✓ 档${tierId + 1} 领取成功`, 'success');
                             successCount++;
                         } catch (e) {
-                            addLog(`✗ 档${tierId + 1} 失败: ${e.message.slice(0,50)}`, 'error');
+                            const errMsg = e.message || '未知错误';
+                            if (errMsg.includes('user rejected')) {
+                                addLog('✗ 用户取消签名，领取终止', 'error');
+                                return;
+                            }
+                            addLog(`✗ 档${tierId + 1} 失败: ${errMsg.slice(0,50)}`, 'error');
                             failCount++;
                         }
                         
-                        await new Promise(r => setTimeout(r, 300));
+                        await new Promise(r => setTimeout(r, 500));
                     }
                 }
                 
-                addLog(`完成！成功: ${successCount}, 失败: ${failCount}`, 'info');
+                if (claimableCount === 0) {
+                    addLog('当前没有可领取的奖励', 'info');
+                } else {
+                    addLog(`完成！成功: ${successCount}, 失败: ${failCount}`, 'info');
+                    lastClaimTime = Date.now();
+                    localStorage.setItem('xyl_last_claim', lastClaimTime.toString());
+                    document.getElementById('lastClaimTime').textContent = `上次领取时间: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
+                }
+                
                 loadDownlines();
                 
             } catch (e) {
