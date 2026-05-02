@@ -599,10 +599,19 @@
             
             <div class="tab-content active" id="tab-home">
                 <div class="card">
-                    <div class="token-info">
-                        <div class="token-name" id="tokenName">--</div>
-                        <div class="token-price" id="tokenPrice">--</div>
-                        <div class="token-change">当前阶段: <span id="currentPhase">--</span></div>
+                    <div class="card-title">当前活跃阶段奖励说明</div>
+                    <div class="phase-reward-card">
+                        <div class="phase-reward-header">
+                            <span class="phase-badge" id="activePhaseBadge">第1阶段</span>
+                            <span class="phase-reward-text">推广奖励比例</span>
+                        </div>
+                        <div class="phase-reward-value" id="currentRewardRate">1%</div>
+                        <div class="phase-progress">
+                            <div class="phase-progress-bar" id="phaseProgressBar" style="width: 0%"></div>
+                        </div>
+                        <div class="phase-progress-text">
+                            已销毁 <span id="burnedForPhase">--</span> / <span id="targetForPhase">4亿</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -639,24 +648,6 @@
                         <span class="data-value" id="tradingStatus">--</span>
                     </div>
                 </div>
-                
-                <div class="card">
-                    <div class="card-title">推广链接</div>
-                    <div class="input-group">
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" class="input-field" id="referralLink" readonly placeholder="推广链接">
-                            <button class="btn btn-primary" onclick="copyReferralLink()" style="width: auto; padding: 12px 16px;">复制</button>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">绑定推荐人（输入推荐人地址）</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" class="input-field" id="referrerInput" placeholder="输入推荐人地址">
-                            <button class="btn btn-primary" onclick="bindReferrer()" style="width: auto; padding: 12px 16px;">绑定</button>
-                        </div>
-                    </div>
-                    <div class="error-box" id="referralError"></div>
-                </div>
             </div>
             
             <div class="tab-content" id="tab-lock">
@@ -688,20 +679,21 @@
             
             <div class="tab-content" id="tab-referral">
                 <div class="card">
-                    <div class="card-title">当前活跃阶段奖励说明</div>
-                    <div class="phase-reward-card">
-                        <div class="phase-reward-header">
-                            <span class="phase-badge" id="activePhaseBadge">第1阶段</span>
-                            <span class="phase-reward-text">推广奖励比例</span>
-                        </div>
-                        <div class="phase-reward-value" id="currentRewardRate">1%</div>
-                        <div class="phase-progress">
-                            <div class="phase-progress-bar" id="phaseProgressBar" style="width: 0%"></div>
-                        </div>
-                        <div class="phase-progress-text">
-                            已销毁 <span id="burnedForPhase">--</span> / <span id="targetForPhase">4亿</span>
+                    <div class="card-title">推广链接</div>
+                    <div class="input-group">
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="input-field" id="referralLink" readonly placeholder="推广链接">
+                            <button class="btn btn-primary" onclick="copyReferralLink()" style="width: auto; padding: 12px 16px;">复制</button>
                         </div>
                     </div>
+                    <div class="input-group">
+                        <label class="input-label">绑定推荐人（输入推荐人地址）</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="input-field" id="referrerInput" placeholder="输入推荐人地址">
+                            <button class="btn btn-primary" onclick="bindReferrer()" style="width: auto; padding: 12px 16px;">绑定</button>
+                        </div>
+                    </div>
+                    <div class="error-box" id="referralError"></div>
                 </div>
                 
                 <div class="card">
