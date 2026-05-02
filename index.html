@@ -614,11 +614,6 @@
                 <div class="card">
                     <div class="card-title">当前活跃阶段奖励说明</div>
                     <div class="phase-reward-card">
-                        <div class="phase-reward-header">
-                            <span class="phase-badge" id="activePhaseBadge">第1阶段</span>
-                            <span class="phase-reward-text">推广奖励比例</span>
-                        </div>
-                        <div class="phase-reward-value" id="currentRewardRate">1%</div>
                         <div class="tier-table">
                             <div class="tier-row tier-header">
                                 <span class="tier-label">档位</span>
@@ -1100,9 +1095,6 @@
                 
                 const rewardRates = ['--', '1%', '3%', '5%'];
                 const phaseTargets = [0, 400000000, 650000000, 800000000];
-                
-                document.getElementById('activePhaseBadge').textContent = phaseNum === 0 ? '已结束' : `第${phaseNum}阶段`;
-                document.getElementById('currentRewardRate').textContent = phaseNum === 0 ? '--' : rewardRates[phaseNum];
                 
                 const burned = await mainContract.methods.getBurnedAmount().call();
                 const burnedNum = Number(burned);
