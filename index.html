@@ -711,14 +711,18 @@
                     <div id="downlineList"></div>
                     
                     <div style="margin-top: 16px;">
-                        <button class="btn btn-green" onclick="autoClaimAll()">一键领取</button>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="refreshAllDownlines()">一键刷新</button>
+                            <button class="btn btn-green" onclick="autoClaimAll()">一键领取</button>
+                        </div>
                         <div style="margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.5);">
-                            <span id="lastClaimTime">上次领取时间: --</span>
+                            <span id="lastClaimTime">上次领取: --</span> | 
+                            <span id="lastRefreshTime">上次刷新: --</span>
                         </div>
                     </div>
                     
                     <div id="claimLog" style="margin-top: 16px; display: none;">
-                        <div class="card-title" style="font-size: 13px;">领取日志</div>
+                        <div class="card-title" style="font-size: 13px;">操作日志</div>
                         <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;" id="logContent"></div>
                     </div>
                 </div>
@@ -948,7 +952,13 @@
                 const savedClaimTime = localStorage.getItem('xyl_last_claim');
                 if (savedClaimTime) {
                     lastClaimTime = parseInt(savedClaimTime);
-                    document.getElementById('lastClaimTime').textContent = `上次领取时间: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
+                    document.getElementById('lastClaimTime').textContent = `上次领取: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
+                }
+                
+                const savedRefreshTime = localStorage.getItem('xyl_last_refresh');
+                if (savedRefreshTime) {
+                    lastRefreshTime = parseInt(savedRefreshTime);
+                    document.getElementById('lastRefreshTime').textContent = `上次刷新: ${new Date(lastRefreshTime).toLocaleString('zh-CN')}`;
                 }
                 
                 await refreshData();
@@ -1146,6 +1156,7 @@
         }
         
         let lastClaimTime = 0;
+        let lastRefreshTime = 0;
         
         async function loadDownlines() {
             if (!mainContract) return;
@@ -1198,6 +1209,34 @@
                 document.getElementById('downlineList').innerHTML = html;
             } catch (e) {
                 console.error('加载下级列表失败:', e);
+            }
+        }
+        
+        async function refreshAllDownlines() {
+            const COOLDOWN_HOURS = 24;
+            const now = Date.now();
+            
+            if (lastRefreshTime > 0 && (now - lastRefreshTime) < (COOLDOWN_HOURS * 60 * 60 * 1000)) {
+                const remaining = Math.ceil((lastRefreshTime + COOLDOWN_HOURS * 60 * 60 * 1000 - now) / (60 * 1000));
+                showToast(`请等待 ${remaining} 分钟后再刷新`, 'error');
+                return;
+            }
+            
+            document.getElementById('claimLog').style.display = 'block';
+            document.getElementById('logContent').innerHTML = '';
+            
+            addLog('开始一键刷新...', 'info');
+            
+            try {
+                await loadDownlines();
+                
+                lastRefreshTime = Date.now();
+                localStorage.setItem('xyl_last_refresh', lastRefreshTime.toString());
+                document.getElementById('lastRefreshTime').textContent = `上次刷新: ${new Date(lastRefreshTime).toLocaleString('zh-CN')}`;
+                
+                addLog('✓ 刷新完成', 'success');
+            } catch (e) {
+                addLog(`✗ 刷新失败: ${e.message}`, 'error');
             }
         }
         
@@ -1275,7 +1314,7 @@
                     addLog(`完成！成功: ${successCount}, 失败: ${failCount}`, 'info');
                     lastClaimTime = Date.now();
                     localStorage.setItem('xyl_last_claim', lastClaimTime.toString());
-                    document.getElementById('lastClaimTime').textContent = `上次领取时间: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
+                    document.getElementById('lastClaimTime').textContent = `上次领取: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
                 }
                 
                 loadDownlines();
