@@ -639,6 +639,24 @@
                         <span class="data-value" id="tradingStatus">--</span>
                     </div>
                 </div>
+                
+                <div class="card">
+                    <div class="card-title">推广链接</div>
+                    <div class="input-group">
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="input-field" id="referralLink" readonly placeholder="推广链接">
+                            <button class="btn btn-primary" onclick="copyReferralLink()" style="width: auto; padding: 12px 16px;">复制</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">绑定推荐人（输入推荐人地址）</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="input-field" id="referrerInput" placeholder="输入推荐人地址">
+                            <button class="btn btn-primary" onclick="bindReferrer()" style="width: auto; padding: 12px 16px;">绑定</button>
+                        </div>
+                    </div>
+                    <div class="error-box" id="referralError"></div>
+                </div>
             </div>
             
             <div class="tab-content" id="tab-lock">
@@ -684,22 +702,6 @@
                             已销毁 <span id="burnedForPhase">--</span> / <span id="targetForPhase">4亿</span>
                         </div>
                     </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-title">推广信息</div>
-                    <div class="input-group">
-                        <label class="input-label">我的推荐码 / 钱包地址</label>
-                        <input type="text" class="input-field" id="myAddress" readonly>
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">绑定推荐人（输入推荐人地址）</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" class="input-field" id="referrerInput" placeholder="输入推荐人地址">
-                            <button class="btn btn-primary" onclick="bindReferrer()" style="width: auto; padding: 12px 16px;">绑定</button>
-                        </div>
-                    </div>
-                    <div class="error-box" id="referralError"></div>
                 </div>
                 
                 <div class="card">
@@ -945,7 +947,9 @@
                 document.getElementById('walletSection').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
                 updateStatus('connected', account.slice(0,6) + '...' + account.slice(-4));
-                document.getElementById('myAddress').value = account;
+                
+                const referralLink = `https://xiao185077324long.github.io/referral/?ref=${account}`;
+                document.getElementById('referralLink').value = referralLink;
                 
                 const savedClaimTime = localStorage.getItem('xyl_last_claim');
                 if (savedClaimTime) {
@@ -1009,6 +1013,27 @@
         function updateStatus(state, text) {
             document.getElementById('statusDot').className = 'status-dot ' + state;
             document.getElementById('statusText').textContent = text;
+        }
+        
+        async function copyReferralLink() {
+            const link = document.getElementById('referralLink').value;
+            if (!link) {
+                showToast('请先连接钱包', 'error');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(link);
+                showToast('复制成功！', 'success');
+            } catch (e) {
+                const textarea = document.createElement('textarea');
+                textarea.value = link;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('复制成功！', 'success');
+            }
         }
         
         async function bindReferrer() {
