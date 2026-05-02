@@ -520,7 +520,7 @@
             font-size: 12px;
             color: rgba(255,255,255,0.6);
         }
-
+        
         .downline-card {
             background: rgba(255,255,255,0.05);
             border-radius: 10px;
@@ -655,12 +655,12 @@
                             <div class="lock-value" id="privateReleased">--</div>
                         </div>
                         
-                        <div class="lock-card project">
+                        <div class="lock-card.project">
                             <div class="lock-label">项目方锁仓总量</div>
                             <div class="lock-value" id="projectLockTotal">--</div>
                         </div>
                         
-                        <div class="lock-card project">
+                        <div class="lock-card.project">
                             <div class="lock-label">项目方释放总量</div>
                             <div class="lock-value" id="projectReleased">--</div>
                         </div>
@@ -704,10 +704,6 @@
                 
                 <div class="card">
                     <div class="card-title">推广奖励领取</div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <span class="data-label">我的下级列表</span>
-                        <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;" onclick="loadDownlines()">刷新</button>
-                    </div>
                     <div id="downlineList"></div>
                     
                     <div style="margin-top: 16px;">
@@ -806,8 +802,10 @@
         const CONFIG = {
             BSC_RPC: "https://bsc-dataseed.binance.org/",
             CHAIN_ID: 56,
+            
             MAIN_CONTRACT: "0x0000000000000000000000000000000000000000",
             LOCK_CONTRACT: "0x0000000000000000000000000000000000000000",
+            
             TOKEN_DECIMALS: 18
         };
         
