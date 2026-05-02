@@ -503,24 +503,35 @@
             margin-bottom: 16px;
         }
         
-        .phase-progress {
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
+        .tier-table {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 8px;
         }
         
-        .phase-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 4px;
-            transition: width 0.3s;
+        .tier-row {
+            display: flex;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         
-        .phase-progress-text {
-            font-size: 12px;
-            color: rgba(255,255,255,0.6);
+        .tier-row:last-child {
+            border-bottom: none;
+        }
+        
+        .tier-header {
+            background: rgba(102,126,234,0.2);
+            font-weight: 600;
+        }
+        
+        .tier-label, .tier-superior, .tier-subordinate {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .tier-label {
+            font-weight: 600;
         }
         
         .downline-card {
@@ -608,11 +619,27 @@
                             <span class="phase-reward-text">推广奖励比例</span>
                         </div>
                         <div class="phase-reward-value" id="currentRewardRate">1%</div>
-                        <div class="phase-progress">
-                            <div class="phase-progress-bar" id="phaseProgressBar" style="width: 0%"></div>
-                        </div>
-                        <div class="phase-progress-text">
-                            已销毁 <span id="burnedForPhase">--</span> / <span id="targetForPhase">4亿</span>
+                        <div class="tier-table">
+                            <div class="tier-row tier-header">
+                                <span class="tier-label">档位</span>
+                                <span class="tier-superior">上级门槛</span>
+                                <span class="tier-subordinate">下级门槛</span>
+                            </div>
+                            <div class="tier-row">
+                                <span class="tier-label">一档</span>
+                                <span class="tier-superior">300万</span>
+                                <span class="tier-subordinate">50万</span>
+                            </div>
+                            <div class="tier-row">
+                                <span class="tier-label">二档</span>
+                                <span class="tier-superior">150万</span>
+                                <span class="tier-subordinate">80万</span>
+                            </div>
+                            <div class="tier-row">
+                                <span class="tier-label">三档</span>
+                                <span class="tier-superior">80万</span>
+                                <span class="tier-subordinate">10万</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -732,10 +759,6 @@
                             <div class="user-value" id="referrerStatus">--</div>
                         </div>
                         <div class="user-item">
-                            <div class="user-label">用户阶段</div>
-                            <div class="user-value" id="userPhase">--</div>
-                        </div>
-                        <div class="user-item">
                             <div class="user-label">当前门槛</div>
                             <div class="user-value" id="userThreshold">--</div>
                         </div>
@@ -777,8 +800,8 @@
                         <span class="data-value" id="holdEndTime">--</span>
                     </div>
                     <div class="data-row">
-                        <span class="data-label">是否满足资格</span>
-                        <span class="data-value" id="holdQualified">--</span>
+                        <span class="data-label">用户阶段</span>
+                        <span class="data-value" id="userPhase">--</span>
                     </div>
                 </div>
                 
@@ -1083,19 +1106,6 @@
                 
                 const burned = await mainContract.methods.getBurnedAmount().call();
                 const burnedNum = Number(burned);
-                let currentTarget = phaseTargets[phaseNum] || 0;
-                let prevTarget = phaseTargets[phaseNum - 1] || 0;
-                
-                let progress = 0;
-                if (currentTarget > prevTarget) {
-                    const phaseBurned = burnedNum - prevTarget;
-                    const phaseTarget = currentTarget - prevTarget;
-                    progress = Math.min(100, Math.max(0, (phaseBurned / phaseTarget) * 100));
-                }
-                
-                document.getElementById('phaseProgressBar').style.width = progress + '%';
-                document.getElementById('burnedForPhase').textContent = formatToken(burnedNum - prevTarget);
-                document.getElementById('targetForPhase').textContent = formatToken(currentTarget - prevTarget);
                 
                 const circulating = await mainContract.methods.getCirculatingSupply().call();
                 document.getElementById('burnedAmount').textContent = formatToken(burned);
