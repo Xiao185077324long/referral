@@ -612,6 +612,24 @@
             
             <div class="tab-content active" id="tab-home">
                 <div class="card">
+                    <div class="card-title">阶段进度</div>
+                    <div class="phase-grid">
+                        <div class="phase-item" id="phase1">
+                            <div class="phase-num">阶段1</div>
+                            <div class="phase-label">1% 奖励</div>
+                        </div>
+                        <div class="phase-item" id="phase2">
+                            <div class="phase-num">阶段2</div>
+                            <div class="phase-label">3% 奖励</div>
+                        </div>
+                        <div class="phase-item" id="phase3">
+                            <div class="phase-num">阶段3</div>
+                            <div class="phase-label">5% 奖励</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
                     <div class="card-title">当前活跃阶段奖励说明</div>
                     <div class="phase-reward-card">
                         <div class="tier-table">
@@ -640,24 +658,6 @@
                 </div>
                 
                 <div class="card">
-                    <div class="card-title">阶段进度</div>
-                    <div class="phase-grid">
-                        <div class="phase-item" id="phase1">
-                            <div class="phase-num">阶段1</div>
-                            <div class="phase-label">1% 奖励</div>
-                        </div>
-                        <div class="phase-item" id="phase2">
-                            <div class="phase-num">阶段2</div>
-                            <div class="phase-label">3% 奖励</div>
-                        </div>
-                        <div class="phase-item" id="phase3">
-                            <div class="phase-num">阶段3</div>
-                            <div class="phase-label">5% 奖励</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
                     <div class="card-title">合约数据</div>
                     <div class="data-row">
                         <span class="data-label">销毁总量</span>
@@ -666,10 +666,6 @@
                     <div class="data-row">
                         <span class="data-label">流通供应</span>
                         <span class="data-value" id="circulating">--</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">交易状态</span>
-                        <span class="data-value" id="tradingStatus">--</span>
                     </div>
                 </div>
             </div>
@@ -743,24 +739,6 @@
                     <div id="claimLog" style="margin-top: 16px; display: none;">
                         <div class="card-title" style="font-size: 13px;">操作日志</div>
                         <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;" id="logContent"></div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-title">我的推广数据</div>
-                    <div class="user-grid">
-                        <div class="user-item">
-                            <div class="user-label">推荐关系</div>
-                            <div class="user-value" id="referrerStatus">--</div>
-                        </div>
-                        <div class="user-item">
-                            <div class="user-label">当前门槛</div>
-                            <div class="user-value" id="userThreshold">--</div>
-                        </div>
-                        <div class="user-item">
-                            <div class="user-label">资格状态</div>
-                            <div class="user-value" id="qualified">--</div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1102,9 +1080,6 @@
                 const circulating = await mainContract.methods.getCirculatingSupply().call();
                 document.getElementById('burnedAmount').textContent = formatToken(burned);
                 document.getElementById('circulating').textContent = formatToken(circulating);
-                
-                const trading = await mainContract.methods.tradingEnabled().call();
-                document.getElementById('tradingStatus').textContent = trading ? '已开启' : '未开启';
                 
                 try {
                     const priceInfo = await mainContract.methods.getPriceInfo().call();
