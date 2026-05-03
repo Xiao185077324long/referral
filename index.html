@@ -1370,6 +1370,8 @@ document.getElementById('errorModal').style.display = 'flex';
 
 function closeErrorModal() {
 document.getElementById('errorModal').style.display = 'none';
+// 同时隐藏操作日志
+document.getElementById('claimLog').style.display = 'none';
 }
 
 function translateError(err) {
