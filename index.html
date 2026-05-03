@@ -115,6 +115,71 @@
             display: none !important;
         }
         
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: rgba(20, 25, 45, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 360px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+        .modal-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .modal-btn-group {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+        
         .card {
             background: rgba(255,255,255,0.08);
             border-radius: 16px;
@@ -745,19 +810,16 @@
                     <div id="downlineList"></div>
                     
                     <div style="margin-top: 16px;">
-                        <div class="btn-group">
-                            <button class="btn btn-primary" onclick="refreshAllDownlines()">一键刷新</button>
-                            <button class="btn btn-green" onclick="autoClaimAll()">一键领取</button>
-                        </div>
-                        <div style="margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.5);">
-                            <span id="lastClaimTime">上次领取: --</span> | 
-                            <span id="lastRefreshTime">上次刷新: --</span>
-                        </div>
+                        <button class="btn btn-primary" onclick="refreshAllDownlines()" style="width: 100%;">一键刷新</button>
                     </div>
                     
-                    <div id="claimLog" style="margin-top: 16px; display: none;">
-                        <div class="card-title" style="font-size: 13px;">操作日志</div>
-                        <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;" id="logContent"></div>
+                    <div style="margin-top: 12px;">
+                        <button class="btn btn-green" onclick="autoClaimAll()" style="width: 100%;">一键领取</button>
+                    </div>
+                    
+                    <div style="margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.5); text-align: center;">
+                        <span id="lastClaimTime">上次领取: --</span> | 
+                        <span id="lastRefreshTime">上次刷新: --</span>
                     </div>
                 </div>
             </div>
@@ -1224,12 +1286,11 @@
                 return;
             }
             
-            if (!confirm('确认要一键领取所有奖励吗？\n\n注意：\n- 每24小时只能领取一次\n- 将自动遍历所有下级\n- 可能需要多笔交易')) {
-                return;
-            }
-            
-            document.getElementById('claimLog').style.display = 'block';
-            document.getElementById('logContent').innerHTML = '';
+            showConfirmModal(async (confirmed) => {
+                if (!confirmed) return;
+                
+                document.getElementById('claimLog').style.display = 'block';
+                document.getElementById('logContent').innerHTML = '';
             
             try {
                 const downlines = await mainContract.methods.downlines(account).call();
@@ -1294,7 +1355,7 @@
             } catch (e) {
                 addLog(`错误: ${e.message}`, 'error');
             }
-        }
+        });
         
         function addLog(msg, type) {
             const logContent = document.getElementById('logContent');
@@ -1313,6 +1374,38 @@
                 }
             }
         });
+        
+        function showConfirmModal(callback) {
+            const modal = document.getElementById('confirmModal');
+            modal.style.display = 'flex';
+            
+            document.getElementById('modalConfirm').onclick = function() {
+                modal.style.display = 'none';
+                callback(true);
+            };
+            
+            document.getElementById('modalCancel').onclick = function() {
+                modal.style.display = 'none';
+                callback(false);
+            };
+        }
     </script>
+    
+    <div id="confirmModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-title">温馨提示</div>
+            <div class="modal-text">
+                确认要一键领取所有奖励吗？<br><br>
+                <strong>注意：</strong><br>
+                - 每24小时只能领取一次<br>
+                - 将自动遍历所有下级<br>
+                - 可能需要多笔交易
+            </div>
+            <div class="modal-btn-group">
+                <button class="modal-btn cancel" id="modalCancel">取消</button>
+                <button class="modal-btn confirm" id="modalConfirm">确认</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
