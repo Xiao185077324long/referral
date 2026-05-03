@@ -610,13 +610,15 @@
             <span class="status-text" id="statusText">未连接</span>
         </div>
         
-        <div class="wallet-section" id="walletSection">
-            <button class="connect-btn" onclick="connectWallet()">连接钱包</button>
-        </div>
-        
-        <div class="hero-title">
-            <h1>小翼龙</h1>
-            <h2>生态社区共治</h2>
+        <div id="beforeConnect">
+            <div class="wallet-section" id="walletSection">
+                <button class="connect-btn" onclick="connectWallet()">连接钱包</button>
+            </div>
+            
+            <div class="hero-title">
+                <h1>小翼龙</h1>
+                <h2>生态社区共治</h2>
+            </div>
         </div>
 
         <div id="mainContent" class="hidden">
@@ -956,9 +958,8 @@
                     console.warn('检查网络失败:', e);
                 }
                 
-                document.getElementById('walletSection').classList.add('hidden');
+                document.getElementById('beforeConnect').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
-                document.querySelector('.hero-title').classList.add('hidden');
                 updateStatus('connected', account.slice(0,6) + '...' + account.slice(-4));
                 
                 const referralLink = `https://xiao185077324long.github.io/referral/?ref=${account}`;
@@ -1018,7 +1019,7 @@
         function disconnectWallet() {
             account = null;
             mainContract = null;
-            document.getElementById('walletSection').classList.remove('hidden');
+            document.getElementById('beforeConnect').classList.remove('hidden');
             document.getElementById('mainContent').classList.add('hidden');
             updateStatus('', '未连接');
         }
