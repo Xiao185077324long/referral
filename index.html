@@ -777,26 +777,6 @@
                     </div>
                 </div>
                 
-                <div class="card">
-                    <div class="card-title">持仓状态</div>
-                    <div class="data-row">
-                        <span class="data-label">当前持仓门槛</span>
-                        <span class="data-value" id="holdThreshold">--</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">门槛开始时间</span>
-                        <span class="data-value" id="holdStartTime">--</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">24小时解锁时间</span>
-                        <span class="data-value" id="holdEndTime">--</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">用户阶段</span>
-                        <span class="data-value" id="userPhase">--</span>
-                    </div>
-                </div>
-                
                 <div class="btn-group">
                     <button class="btn btn-primary" onclick="disconnectWallet()">断开连接</button>
                 </div>
@@ -1083,7 +1063,6 @@
                 
                 const activePhase = await mainContract.methods.getActivePhase().call();
                 const phaseNum = Number(activePhase);
-                document.getElementById('currentPhase').textContent = phaseNum === 0 ? '已结束' : `阶段${phaseNum}`;
                 
                 ['phase1', 'phase2', 'phase3'].forEach((id, i) => {
                     document.getElementById(id).classList.toggle('active', i + 1 === phaseNum);
@@ -1099,32 +1078,8 @@
                 document.getElementById('burnedAmount').textContent = formatToken(burned);
                 document.getElementById('circulating').textContent = formatToken(circulating);
                 
-                try {
-                    const priceInfo = await mainContract.methods.getPriceInfo().call();
-                    if (priceInfo[2] > 0) {
-                        const priceBNB = Number(priceInfo[2]) / 1e18;
-                        document.getElementById('tokenPrice').textContent = priceBNB.toFixed(8) + ' BNB';
-                    }
-                } catch (e) {}
-                
                 const balance = await mainContract.methods.balanceOf(account).call();
                 document.getElementById('userBalance').textContent = formatToken(balance);
-                
-                const userReferrer = await mainContract.methods.referrer(account).call();
-                document.getElementById('referrerStatus').textContent = 
-                    userReferrer !== '0x0000000000000000000000000000000000000000' ? '已绑定' : '未绑定';
-                
-                const userPhase = await mainContract.methods.getUserPhase(account).call();
-                document.getElementById('userPhase').textContent = 
-                    Number(userPhase) === 0 ? '新用户' : `阶段${userPhase}`;
-                
-                const holdInfo = await mainContract.methods.getUserHoldInfo(account).call();
-                document.getElementById('userThreshold').textContent = formatToken(holdInfo[0]);
-                document.getElementById('holdThreshold').textContent = formatToken(holdInfo[0]);
-                document.getElementById('holdStartTime').textContent = formatDate(holdInfo[1]);
-                document.getElementById('holdEndTime').textContent = formatDate(holdInfo[2]);
-                document.getElementById('holdQualified').textContent = holdInfo[3] ? '✅ 满足' : '❌ 不满足';
-                document.getElementById('qualified').textContent = holdInfo[3] ? '✅' : '❌';
                 
                 const dexInfo = await mainContract.methods.getUserDEXBuyInfo(account).call();
                 document.getElementById('dexBuy').textContent = formatToken(dexInfo[0]);
