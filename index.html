@@ -1286,7 +1286,7 @@
                 return;
             }
             
-            showConfirmModal((confirmed) => {
+            showConfirmModal(async (confirmed) => {
                 if (!confirmed) return;
                 
                 document.getElementById('claimLog').style.display = 'block';
