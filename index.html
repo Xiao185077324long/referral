@@ -745,19 +745,15 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 <div id="downlineList"></div>
 
 <div style="margin-top: 16px;">
-<div class="btn-group">
-<button class="btn btn-primary" onclick="refreshAllDownlines()">一键刷新</button>
-<button class="btn btn-green" onclick="autoClaimAll()">一键领取</button>
-</div>
-<div style="margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.5);">
-<span id="lastClaimTime">上次领取: --</span> | 
-<span id="lastRefreshTime">上次刷新: --</span>
-</div>
+<button class="btn btn-primary" onclick="refreshAllDownlines()" style="width: 100%;">一键刷新</button>
 </div>
 
-<div id="claimLog" style="margin-top: 16px; display: none;">
-<div class="card-title" style="font-size: 13px;">操作日志</div>
-<div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;" id="logContent"></div>
+<div style="margin-top: 12px;">
+<button class="btn btn-green" onclick="autoClaimAll()" style="width: 100%;">一键领取</button>
+</div>
+
+<div style="margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.5); text-align: center;">
+<span id="lastClaimTime">上次领取: --</span>
 </div>
 </div>
 </div>
@@ -971,11 +967,7 @@ lastClaimTime = parseInt(savedClaimTime);
 document.getElementById('lastClaimTime').textContent = `上次领取: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
 }
 
-const savedRefreshTime = localStorage.getItem('xyl_last_refresh');
-if (savedRefreshTime) {
-lastRefreshTime = parseInt(savedRefreshTime);
-document.getElementById('lastRefreshTime').textContent = `上次刷新: ${new Date(lastRefreshTime).toLocaleString('zh-CN')}`;
-}
+
 
 await refreshData();
 
@@ -1173,7 +1165,6 @@ console.error('获取锁仓数据失败:', error);
 }
 
 let lastClaimTime = 0;
-let lastRefreshTime = 0;
 
 async function loadDownlines() {
 if (!mainContract) return;
@@ -1230,30 +1221,10 @@ console.error('加载下级列表失败:', e);
 }
 
 async function refreshAllDownlines() {
-const COOLDOWN_HOURS = 24;
-const now = Date.now();
-
-if (lastRefreshTime > 0 && (now - lastRefreshTime) < (COOLDOWN_HOURS * 60 * 60 * 1000)) {
-const remaining = Math.ceil((lastRefreshTime + COOLDOWN_HOURS * 60 * 60 * 1000 - now) / (60 * 1000));
-showToast(`请等待 ${remaining} 分钟后再刷新`, 'error');
-return;
-}
-
-document.getElementById('claimLog').style.display = 'block';
-document.getElementById('logContent').innerHTML = '';
-
-addLog('开始一键刷新...', 'info');
-
 try {
 await loadDownlines();
-
-lastRefreshTime = Date.now();
-localStorage.setItem('xyl_last_refresh', lastRefreshTime.toString());
-document.getElementById('lastRefreshTime').textContent = `上次刷新: ${new Date(lastRefreshTime).toLocaleString('zh-CN')}`;
-
-addLog('✓ 刷新完成', 'success');
 } catch (e) {
-addLog(`✗ 刷新失败: ${e.message}`, 'error');
+console.error('刷新失败:', e);
 }
 }
 
@@ -1273,14 +1244,11 @@ if (!confirm('确认要一键领取所有奖励吗？\n\n注意：\n- 每24小�
 return;
 }
 
-document.getElementById('claimLog').style.display = 'block';
-document.getElementById('logContent').innerHTML = '';
-
 try {
 const downlines = await mainContract.methods.downlines(account).call();
 
 if (downlines.length === 0) {
-addLog('没有下级可领取', 'info');
+showToast('没有下级可领取', 'info');
 return;
 }
 
@@ -1290,9 +1258,6 @@ const myHold = await mainContract.methods.getCurrentPhaseNetHold(account).call()
 let successCount = 0;
 let failCount = 0;
 let claimableCount = 0;
-
-addLog('开始一键领取奖励...', 'info');
-addLog(`当前阶段: ${currentPhase}, 下级数量: ${downlines.length}`, 'info');
 
 for (const downline of downlines) {
 const tierClaimed = await mainContract.methods.tierClaimed(account, downline, currentPhase).call();
@@ -1305,19 +1270,15 @@ const tier = await mainContract.methods.phaseTiers(currentPhase, tierId).call();
 if (Number(downHold) < Number(tier.downMin) || Number(myHold) < Number(tier.upMin)) continue;
 
 claimableCount++;
-addLog(`尝试领取 ${downline.slice(0,6)}...${downline.slice(-4)} 档${tierId + 1}`, 'info');
 
 try {
 await mainContract.methods.claimReward(downline, tierId).send({ from: account });
-addLog(`✓ 档${tierId + 1} 领取成功`, 'success');
 successCount++;
 } catch (e) {
 const errMsg = e.message || '未知错误';
 if (errMsg.includes('user rejected')) {
-addLog('✗ 用户取消签名，领取终止', 'error');
 return;
 }
-addLog(`✗ 档${tierId + 1} 失败: ${errMsg.slice(0,50)}`, 'error');
 failCount++;
 }
 
@@ -1326,28 +1287,22 @@ await new Promise(r => setTimeout(r, 500));
 }
 
 if (claimableCount === 0) {
-addLog('当前没有可领取的奖励', 'info');
+showToast('当前没有可领取的奖励', 'info');
 } else {
-addLog(`完成！成功: ${successCount}, 失败: ${failCount}`, 'info');
 lastClaimTime = Date.now();
 localStorage.setItem('xyl_last_claim', lastClaimTime.toString());
 document.getElementById('lastClaimTime').textContent = `上次领取: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
+if (successCount > 0) {
+showToast(`领取成功！成功: ${successCount}, 失败: ${failCount}`, 'success');
+}
 }
 
 loadDownlines();
 
 } catch (e) {
-addLog(`错误: ${e.message}`, 'error');
+console.error('领取错误:', e.message);
+showToast('领取失败', 'error');
 }
-}
-
-function addLog(msg, type) {
-const logContent = document.getElementById('logContent');
-const div = document.createElement('div');
-div.className = `log-item log-${type}`;
-div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-logContent.appendChild(div);
-logContent.scrollTop = logContent.scrollHeight;
 }
 
 window.addEventListener('load', async () => {
