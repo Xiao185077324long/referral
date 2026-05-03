@@ -975,13 +975,11 @@ document.getElementById('referralLink').value = referralLink;
 const savedClaimTime = localStorage.getItem('xyl_last_claim');
 if (savedClaimTime) {
 lastClaimTime = parseInt(savedClaimTime);
-document.getElementById('lastClaimTime').textContent = `上次领取: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
 }
 
 const savedRefreshTime = localStorage.getItem('xyl_last_refresh');
 if (savedRefreshTime) {
 lastRefreshTime = parseInt(savedRefreshTime);
-document.getElementById('lastRefreshTime').textContent = `上次刷新: ${new Date(lastRefreshTime).toLocaleString('zh-CN')}`;
 }
 
 await refreshData();
