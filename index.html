@@ -624,7 +624,7 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 <div id="mainContent" class="hidden">
 <div class="tab-nav">
 <button class="tab-btn active" onclick="switchTab('home')">首页</button>
-<button class="tab-btn" onclick="switchTab('lock')">锁仓</button>
+<button class="tab-btn" onclick="switchTab('lock')">锁仓数据</button>
 <button class="tab-btn" onclick="switchTab('referral')">推广</button>
 <button class="tab-btn" onclick="switchTab('info')">我的</button>
 </div>
@@ -691,7 +691,7 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 
 <div class="tab-content" id="tab-lock">
 <div class="card">
-<div class="card-title">锁仓</div>
+<div class="card-title">锁仓数据</div>
 <div class="lock-grid">
 <div class="lock-card private">
 <div class="lock-label">私募方锁仓总量</div>
@@ -749,7 +749,10 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 <button class="btn btn-primary" onclick="refreshAllDownlines()">一键刷新</button>
 <button class="btn btn-green" onclick="autoClaimAll()">一键领取</button>
 </div>
-
+<div style="margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.5);">
+<span id="lastClaimTime">上次领取: --</span> | 
+<span id="lastRefreshTime">上次刷新: --</span>
+</div>
 </div>
 
 <div id="claimLog" style="margin-top: 16px; display: none;">
@@ -975,11 +978,13 @@ document.getElementById('referralLink').value = referralLink;
 const savedClaimTime = localStorage.getItem('xyl_last_claim');
 if (savedClaimTime) {
 lastClaimTime = parseInt(savedClaimTime);
+document.getElementById('lastClaimTime').textContent = `上次领取: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
 }
 
 const savedRefreshTime = localStorage.getItem('xyl_last_refresh');
 if (savedRefreshTime) {
 lastRefreshTime = parseInt(savedRefreshTime);
+document.getElementById('lastRefreshTime').textContent = `上次刷新: ${new Date(lastRefreshTime).toLocaleString('zh-CN')}`;
 }
 
 await refreshData();
@@ -1245,24 +1250,21 @@ showToast(`请等待 ${remaining} 分钟后再刷新`, 'error');
 return;
 }
 
+document.getElementById('claimLog').style.display = 'block';
+document.getElementById('logContent').innerHTML = '';
+
+addLog('开始一键刷新...', 'info');
+
 try {
 await loadDownlines();
 
 lastRefreshTime = Date.now();
 localStorage.setItem('xyl_last_refresh', lastRefreshTime.toString());
+document.getElementById('lastRefreshTime').textContent = `上次刷新: ${new Date(lastRefreshTime).toLocaleString('zh-CN')}`;
 
-const nextRefreshTime = new Date(lastRefreshTime + COOLDOWN_HOURS * 60 * 60 * 1000);
-document.getElementById('refreshInfo').innerHTML = 
-    `上次刷新: ${new Date(lastRefreshTime).toLocaleString('zh-CN')}<br>` +
-    `下次刷新: ${nextRefreshTime.toLocaleString('zh-CN')}`;
-
-const modal = document.getElementById('refreshModal');
-modal.style.display = 'flex';
-document.getElementById('refreshModalOk').onclick = function() {
-    modal.style.display = 'none';
-};
+addLog('✓ 刷新完成', 'success');
 } catch (e) {
-console.error('刷新失败:', e);
+addLog(`✗ 刷新失败: ${e.message}`, 'error');
 }
 }
 
@@ -1445,18 +1447,5 @@ await connectWallet();
 }
 });
 </script>
-
-<div id="refreshModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-title">刷新信息</div>
-        <div class="modal-text" id="refreshInfo">
-            上次刷新: --<br>
-            下次刷新: --
-        </div>
-        <div class="modal-btn-group">
-            <button class="modal-btn confirm" id="refreshModalOk">确定</button>
-        </div>
-    </div>
-</div>
 </body>
 </html>
