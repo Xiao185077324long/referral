@@ -38,6 +38,33 @@
             border-radius: 16px;
         }
         
+        .hero-title {
+            width: 100%;
+            text-align: center;
+            padding: 40px 16px;
+            margin-bottom: 16px;
+        }
+        
+        .hero-title h1 {
+            font-size: clamp(36px, 10vw, 72px);
+            font-weight: 700;
+            margin: 0;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+        
+        .hero-title h2 {
+            font-size: clamp(20px, 5vw, 36px);
+            font-weight: 500;
+            margin: 16px 0 0 0;
+            color: #f093fb;
+            letter-spacing: 6px;
+        }
+        
         .status-bar {
             display: flex;
             justify-content: center;
@@ -581,6 +608,11 @@
         
         <div class="wallet-section" id="walletSection">
             <button class="connect-btn" onclick="connectWallet()">连接钱包</button>
+        </div>
+        
+        <div class="hero-title">
+            <h1>小翼龙</h1>
+            <h2>生态社区共治</h2>
         </div>
         
         <div id="mainContent" class="hidden">
