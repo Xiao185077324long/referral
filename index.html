@@ -813,6 +813,16 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 
 <div class="toast" id="toast"></div>
 
+<!-- 错误弹窗 -->
+<div id="errorModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;">
+<div style="background: rgba(30,30,50,0.95); border-radius: 16px; padding: 24px; max-width: 320px; width: 90%; text-align: center; border: 1px solid rgba(255,71,87,0.5);">
+<div style="font-size: 48px; margin-bottom: 16px;">❌</div>
+<div id="errorModalTitle" style="font-size: 16px; font-weight: 600; color: #ff6b6b; margin-bottom: 8px;">操作错误</div>
+<div id="errorModalMessage" style="font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 20px; word-break: break-all;"></div>
+<button onclick="closeErrorModal()" style="background: linear-gradient(135deg, #ff4757, #ff6b6b); color: #fff; border: none; padding: 12px 32px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;">确定</button>
+</div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 <script>
 const CONFIG = {
@@ -1270,10 +1280,6 @@ showToast(`请等待 ${remaining} 分钟后再领取`, 'error');
 return;
 }
 
-if (!confirm('确认要一键领取所有奖励吗？\n\n注意：\n- 每24小时只能领取一次\n- 将自动遍历所有下级\n- 可能需要多笔交易')) {
-return;
-}
-
 document.getElementById('claimLog').style.display = 'block';
 document.getElementById('logContent').innerHTML = '';
 
@@ -1349,6 +1355,21 @@ div.className = `log-item log-${type}`;
 div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
 logContent.appendChild(div);
 logContent.scrollTop = logContent.scrollHeight;
+
+// 错误时显示弹窗
+if (type === 'error') {
+showErrorModal('操作错误', msg);
+}
+}
+
+function showErrorModal(title, message) {
+document.getElementById('errorModalTitle').textContent = title;
+document.getElementById('errorModalMessage').textContent = message;
+document.getElementById('errorModal').style.display = 'flex';
+}
+
+function closeErrorModal() {
+document.getElementById('errorModal').style.display = 'none';
 }
 
 function translateError(err) {
