@@ -25,32 +25,44 @@
             padding: 16px;
         }
         
-        .logo-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin-bottom: 8px;
+        .top-banner {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        
+        .top-banner img {
+            display: block;
+            width: 100%;
+            height: 180px;
             object-fit: cover;
+            border-radius: 16px;
         }
         
-        .header {
+        .hero-title {
+            width: 100%;
             text-align: center;
-            padding: 60px 20px;
-            background-image: url('150659f2ce7580b3be6b695195574c44_720.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            padding: 40px 16px;
+            margin-bottom: 16px;
         }
         
-        .header h1 {
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 4px;
+        .hero-title h1 {
+            font-size: clamp(36px, 10vw, 72px);
+            font-weight: 700;
+            margin: 0;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
         }
         
-        .header .subtitle {
-            color: rgba(255,255,255,0.6);
-            font-size: 13px;
+        .hero-title h2 {
+            font-size: clamp(20px, 5vw, 36px);
+            font-weight: 500;
+            margin: 16px 0 0 0;
+            color: #f093fb;
+            letter-spacing: 6px;
         }
         
         .status-bar {
@@ -399,10 +411,6 @@
                 padding: 24px;
             }
             
-            .header h1 {
-                font-size: 28px;
-            }
-            
             .lock-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
@@ -589,7 +597,8 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <div class="top-banner">
+            <img src="150659f2ce7580b3be6b695195574c44_720.jpg" alt="banner">
         </div>
         
         <div class="status-bar">
@@ -599,6 +608,11 @@
         
         <div class="wallet-section" id="walletSection">
             <button class="connect-btn" onclick="connectWallet()">连接钱包</button>
+        </div>
+        
+        <div class="hero-title">
+            <h1>小翼龙</h1>
+            <h2>生态社区共治</h2>
         </div>
         
         <div id="mainContent" class="hidden">
@@ -1059,8 +1073,7 @@
             isLoading = true;
             
             try {
-                const name = await mainContract.methods.name().call();
-                document.getElementById('tokenName').textContent = name;
+                await mainContract.methods.name().call();
                 
                 const activePhase = await mainContract.methods.getActivePhase().call();
                 const phaseNum = Number(activePhase);
