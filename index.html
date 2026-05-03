@@ -45,6 +45,10 @@
             margin-bottom: 16px;
         }
         
+        .hero-title.hidden {
+            display: none;
+        }
+        
         .hero-title h1 {
             font-size: clamp(36px, 10vw, 72px);
             font-weight: 700;
@@ -614,7 +618,7 @@
             <h1>小翼龙</h1>
             <h2>生态社区共治</h2>
         </div>
-        
+
         <div id="mainContent" class="hidden">
             <div class="tab-nav">
                 <button class="tab-btn active" onclick="switchTab('home')">首页</button>
@@ -954,6 +958,7 @@
                 
                 document.getElementById('walletSection').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
+                document.querySelector('.hero-title').classList.add('hidden');
                 updateStatus('connected', account.slice(0,6) + '...' + account.slice(-4));
                 
                 const referralLink = `https://xiao185077324long.github.io/referral/?ref=${account}`;
