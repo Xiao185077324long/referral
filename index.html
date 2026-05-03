@@ -1063,11 +1063,12 @@ showToast('绑定成功！', 'success');
 refreshData();
 } catch (error) {
 console.error('绑定失败:', error);
-let msg = '绑定失败';
-if (error.message.includes('AlreadyBound')) msg = '您已经绑定过推荐人';
-else if (error.message.includes('InvalidReferrer')) msg = '不能绑定自己为推荐人';
-else if (error.message.includes('user rejected')) msg = '用户取消签名';
+let msg = translateError(error);
+if (msg.includes('user rejected') || msg === '用户取消签名') {
+showError('用户取消签名');
+} else {
 showError(msg);
+}
 }
 }
 
@@ -1312,12 +1313,12 @@ await mainContract.methods.claimReward(downline, tierId).send({ from: account })
 addLog(`✓ 档${tierId + 1} 领取成功`, 'success');
 successCount++;
 } catch (e) {
-const errMsg = e.message || '未知错误';
-if (errMsg.includes('user rejected')) {
+const errMsg = translateError(e);
+if (errMsg === '用户取消签名') {
 addLog('✗ 用户取消签名，领取终止', 'error');
 return;
 }
-addLog(`✗ 档${tierId + 1} 失败: ${translateError(errMsg)}`, 'error');
+addLog(`✗ 档${tierId + 1} 失败: ${errMsg}`, 'error');
 failCount++;
 }
 
@@ -1337,7 +1338,7 @@ document.getElementById('lastClaimTime').textContent = `上次领取: ${new Date
 loadDownlines();
 
 } catch (e) {
-addLog(`错误: ${e.message}`, 'error');
+addLog(`错误: ${translateError(e)}`, 'error');
 }
 }
 
@@ -1350,24 +1351,68 @@ logContent.appendChild(div);
 logContent.scrollTop = logContent.scrollHeight;
 }
 
-function translateError(errMsg) {
-const errorMap = {
-'24h hold not met': '24小时持仓未满足',
-'Tier hold timer not started': '档位持仓计时未开始',
-'Tier already claimed': '该档位已领取',
-'Hold not qualified': '持仓不达标',
-'Up hold not enough': '上级持仓不足',
-'user rejected': '用户取消签名',
-'Already claimed': '已领取过',
-'Not qualified': '不满足条件',
-'Insufficient balance': '余额不足',
-'Transfer failed': '转账失败',
-'Unauthorized': '未授权'
-};
-for (const [en, zh] of Object.entries(errorMap)) {
-if (errMsg.includes(en)) return zh;
-}
-return errMsg.slice(0, 50);
+function translateError(err) {
+    // Web3 错误可能是对象或字符串
+    let errMsg = '';
+    if (typeof err === 'object') {
+        if (err.message) errMsg = err.message;
+        else if (err.reason) errMsg = err.reason;
+        else if (err.data) errMsg = JSON.stringify(err.data);
+        else errMsg = JSON.stringify(err);
+    } else {
+        errMsg = err;
+    }
+    
+    // 常见错误映射（按优先级排序，最特殊的在前）
+    const errorMap = [
+        ['execution reverted: 24h hold not met', '24小时持仓未满足'],
+        ['execution reverted: Tier hold timer not started', '档位持仓计时未开始'],
+        ['execution reverted: Tier already claimed', '该档位已领取'],
+        ['execution reverted: Down hold not enough', '下级持仓不足'],
+        ['execution reverted: Up hold not enough', '上级持仓不足'],
+        ['execution reverted: Hold not qualified', '持仓不达标'],
+        ['execution reverted: Already bound', '已绑定过推荐人'],
+        ['execution reverted: Invalid referrer', '无效推荐人'],
+        ['execution reverted: Self ref', '不能绑定自己为推荐人'],
+        ['execution reverted: No buy', '下级未购买过'],
+        ['execution reverted: Too soon', '操作太频繁，请稍后'],
+        ['execution reverted: Invalid tier', '无效档位'],
+        ['execution reverted: Not referrer', '不是该下级的推荐人'],
+        ['execution reverted: Old user must clear', '老用户需先清仓'],
+        ['24h hold not met', '24小时持仓未满足'],
+        ['Tier hold timer not started', '档位持仓计时未开始'],
+        ['Tier already claimed', '该档位已领取'],
+        ['Down hold not enough', '下级持仓不足'],
+        ['Up hold not enough', '上级持仓不足'],
+        ['Hold not qualified', '持仓不达标'],
+        ['Already bound', '已绑定过推荐人'],
+        ['Invalid referrer', '无效推荐人'],
+        ['Self ref', '不能绑定自己为推荐人'],
+        ['No buy', '下级未购买过'],
+        ['user rejected', '用户取消签名'],
+        ['Already claimed', '已领取过'],
+        ['Not qualified', '不满足条件'],
+        ['Insufficient balance', '余额不足'],
+        ['Transfer failed', '转账失败'],
+        ['Unauthorized', '未授权'],
+        ['Already signed', '已签名'],
+        ['Not enough signatures', '签名数量不足'],
+        ['Invalid address', '无效地址']
+    ];
+    
+    for (const [en, zh] of errorMap) {
+        if (errMsg.includes(en)) return zh;
+    }
+    
+    // 提取 revert 后面的消息
+    const revertMatch = errMsg.match(/revert\s+(\w+\s*\w*)/i);
+    if (revertMatch) {
+        const reason = revertMatch[1].trim();
+        return `操作失败: ${reason}`;
+    }
+    
+    // 返回简化后的原始消息
+    return errMsg.length > 60 ? errMsg.substring(0, 60) + '...' : errMsg;
 }
 
 window.addEventListener('load', async () => {
