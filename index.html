@@ -690,7 +690,7 @@ width: 100%;
 <button class="tab-btn" onclick="switchTab('info')" data-i18n="tabInfo">我的</button>
 <div class="lang-selector">
 <select id="langSelect" onchange="setLanguage(this.value); applyTranslations();">
-<option value="zh">中文</option>
+<option value="zh-TW">中文</option>
 <option value="en">English</option>
 <option value="ja">日本語</option>
 <option value="ko">한국어</option>
@@ -904,89 +904,89 @@ TOKEN_DECIMALS: 18
 };
 
 const I18N = {
-zh: {
-pageTitle: '小翼龙 Token',
-tokenName: '小翼龙',
-tokenSlogan: '生态社区共治',
-notConnected: '未连接',
-connectWallet: '连接钱包',
-disconnectWallet: '断开连接',
-tabHome: '首页',
-tabLock: '锁仓',
-tabReferral: '推广',
+'zh-TW': {
+pageTitle: '小翼龍 Token',
+tokenName: '小翼龍',
+tokenSlogan: '生態社區共治',
+notConnected: '未連接',
+connectWallet: '連接錢包',
+disconnectWallet: '斷開連接',
+tabHome: '首頁',
+tabLock: '鎖倉',
+tabReferral: '推廣',
 tabInfo: '我的',
-phaseProgress: '阶段进度',
-phase1: '阶段1',
-phase2: '阶段2',
-phase3: '阶段3',
-reward1Percent: '1% 奖励',
-reward3Percent: '3% 奖励',
-reward5Percent: '5% 奖励',
-currentPhaseRewardDesc: '当前活跃阶段奖励说明',
-tier: '档位',
-superiorThreshold: '上级门槛',
-subordinateThreshold: '下级门槛',
-tierOne: '一档',
-tierTwo: '二档',
-tierThree: '三档',
-threshold300M: '300万',
-threshold150M: '150万',
-threshold80M: '80万',
-threshold80M2: '80万',
-threshold50M: '50万',
-threshold10M: '10万',
-contractData: '合约数据',
-burnedAmount: '销毁总量',
-circulatingSupply: '流通供应',
-lockData: '锁仓',
-privateLockTotal: '私募方锁仓总量',
-privateReleased: '私募方释放总量',
-projectData: '项目方数据',
-projectLockTotal: '项目方锁仓总量',
-projectReleased: '项目方释放总量',
-referralLink: '推广链接',
-copyLink: '复制',
-bindReferrer: '绑定',
-bindReferrerLabel: '绑定推荐人（输入推荐人地址）',
-referralLinkPlaceholder: '推广链接',
-referrerPlaceholder: '输入推荐人地址',
-referralRewardClaim: '推广奖励领取',
-refreshAll: '一键刷新',
-claimAll: '一键领取',
-noDownline: '暂无下级',
-notQualified: '未达标',
-claimable: '可领取',
-claimedAll: '已领完',
-myWallet: '我的钱包',
-tokenBalance: '代币余额',
-totalDexBuy: '累计DEX买入',
-holdStatus: '持仓状态',
-currentHoldThreshold: '当前持仓门槛',
-holdStartTime: '门槛开始时间',
-unlockTime24h: '24小时解锁时间',
-userPhase: '用户阶段',
+phaseProgress: '階段進度',
+phase1: '階段1',
+phase2: '階段2',
+phase3: '階段3',
+reward1Percent: '1% 獎勵',
+reward3Percent: '3% 獎勵',
+reward5Percent: '5% 獎勵',
+currentPhaseRewardDesc: '當前活躍階段獎勵說明',
+tier: '檔位',
+superiorThreshold: '上級門檻',
+subordinateThreshold: '下級門檻',
+tierOne: '一檔',
+tierTwo: '二檔',
+tierThree: '三檔',
+threshold300M: '300萬',
+threshold150M: '150萬',
+threshold80M: '80萬',
+threshold80M2: '80萬',
+threshold50M: '50萬',
+threshold10M: '10萬',
+contractData: '合約數據',
+burnedAmount: '銷毀總量',
+circulatingSupply: '流通供應',
+lockData: '鎖倉',
+privateLockTotal: '私募方鎖倉總量',
+privateReleased: '私募方釋放總量',
+projectData: '項目方數據',
+projectLockTotal: '項目方鎖倉總量',
+projectReleased: '項目方釋放總量',
+referralLink: '推廣鏈接',
+copyLink: '複製',
+bindReferrer: '綁定',
+bindReferrerLabel: '綁定推薦人（輸入推薦人地址）',
+referralLinkPlaceholder: '推廣鏈接',
+referrerPlaceholder: '輸入推薦人地址',
+referralRewardClaim: '推廣獎勵領取',
+refreshAll: '一鍵刷新',
+claimAll: '一鍵領取',
+noDownline: '暫無下級',
+notQualified: '未達標',
+claimable: '可領取',
+claimedAll: '已領完',
+myWallet: '我的錢包',
+tokenBalance: '代幣餘額',
+totalDexBuy: '累計DEX買入',
+holdStatus: '持倉狀態',
+currentHoldThreshold: '當前持倉門檻',
+holdStartTime: '門檻開始時間',
+unlockTime24h: '24小時解鎖時間',
+userPhase: '用戶階段',
 refreshInfo: '刷新信息',
 lastRefresh: '上次刷新',
 nextRefresh: '下次刷新',
-confirm: '确定',
-installWallet: '请安装 MetaMask、TokenPocket 或其他 Web3 钱包',
-switchToBSC: '请手动切换到 BSC 主网',
-autoBindReferrer: '正在自动绑定推荐人...',
-bindSuccess: '推荐人绑定成功！',
-connectFirst: '请先连接钱包',
-copySuccess: '复制成功！',
-bindSuccessToast: '绑定成功！',
-waitToRefresh: '请等待 {minutes} 分钟后再刷新',
-waitToClaim: '请等待 {minutes} 分钟后再领取',
-noDownlineToClaim: '没有下级可领取',
-startClaiming: '开始一键领取奖励...',
-userCancelled: '用户取消签名，领取终止',
-noClaimableReward: '当前没有可领取的奖励',
-downline: '下级',
-tierClaim: '档',
-claimSuccess: '领取成功',
-claimFailed: '失败',
-operationError: '操作错误'
+confirm: '確定',
+installWallet: '請安裝 MetaMask、TokenPocket 或其他 Web3 錢包',
+switchToBSC: '請手動切換到 BSC 主網',
+autoBindReferrer: '正在自動綁定推薦人...',
+bindSuccess: '推薦人綁定成功！',
+connectFirst: '請先連接錢包',
+copySuccess: '複製成功！',
+bindSuccessToast: '綁定成功！',
+waitToRefresh: '請等待 {minutes} 分鐘後再刷新',
+waitToClaim: '請等待 {minutes} 分鐘後再領取',
+noDownlineToClaim: '沒有下級可領取',
+startClaiming: '開始一鍵領取獎勵...',
+userCancelled: '用戶取消簽名，領取終止',
+noClaimableReward: '當前沒有可領取的獎勵',
+downline: '下級',
+tierClaim: '檔',
+claimSuccess: '領取成功',
+claimFailed: '失敗',
+operationError: '操作錯誤'
 },
 en: {
 pageTitle: 'XYL Token',
@@ -1374,16 +1374,17 @@ operationError: 'ข้อผิดพลาดการทำงาน'
 }
 };
 
-let currentLang = localStorage.getItem('xyl_lang') || 'zh';
+let currentLang = localStorage.getItem('xyl_lang') || 'zh-TW';
 
 function t(key) {
-const langData = I18N[currentLang] || I18N.zh;
+const langData = I18N[currentLang] || I18N['zh-TW'];
 return langData[key] || key;
 }
 
 function setLanguage(lang) {
 currentLang = lang;
 localStorage.setItem('xyl_lang', lang);
+document.getElementById('langSelect').value = lang;
 applyTranslations();
 }
 
@@ -1392,6 +1393,10 @@ document.title = t('pageTitle');
 document.querySelectorAll('[data-i18n]').forEach(el => {
 const key = el.getAttribute('data-i18n');
 el.textContent = t(key);
+});
+document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+const key = el.getAttribute('data-i18n-placeholder');
+el.placeholder = t(key);
 });
 }
 
@@ -2005,6 +2010,8 @@ const savedLang = localStorage.getItem('xyl_lang');
 if (savedLang) {
 currentLang = savedLang;
 document.getElementById('langSelect').value = savedLang;
+} else {
+document.getElementById('langSelect').value = 'zh-TW';
 }
 applyTranslations();
 
