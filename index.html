@@ -818,73 +818,87 @@ background: rgba(102,126,234,0.5);
 </head>
 <body>
 <script>
-// 语言选择器初始化 - DOM加载完成后执行
-document.addEventListener('DOMContentLoaded', function() {
+// 语言选择器初始化 - 使用多种方式确保TP钱包兼容
+// TP钱包兼容版 - 直接切换语言的函数
+function switchLang(lang) {
+setLanguage(lang);
+updateLangButtons();
+}
+
+// 更新语言按钮样式
+function updateLangButtons() {
+const langs = ['zh-CN', 'en', 'ja', 'ko', 'vi', 'th', 'es', 'id', 'ms', 'pt', 'ru', 'ar', 'hi', 'zh-TW'];
+langs.forEach(function(l) {
+const btn = document.getElementById('btn-' + l);
+if (btn) {
+if (l === currentLang) {
+btn.style.background = '#667eea';
+btn.style.color = '#fff';
+btn.style.border = '2px solid #764ba2';
+} else {
+btn.style.background = '#f0f0f0';
+btn.style.color = '#333';
+btn.style.border = '1px solid #ddd';
+}
+}
+});
+}
+
+function initLanguageSelector() {
 // 初始化语言
 const savedLang = localStorage.getItem('xyl_lang') || 'zh-CN';
 if (savedLang) {
 setLanguage(savedLang);
 }
+updateLangButtons();
+console.log('Language selector initialized!');
+}
 
-// 绑定按钮点击事件 - 增强TP钱包兼容性
+// 方式1: DOMContentLoaded
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', initLanguageSelector);
+} else {
+// DOM已经加载完成
+initLanguageSelector();
+}
+
+// 方式2: window.onload 作为备用
+window.addEventListener('load', function() {
+setTimeout(initLanguageSelector, 100);
+});
+
+// 方式3: 延迟检查作为最后备用
+setTimeout(function() {
+const switcher = document.getElementById('langSwitcher');
+if (!switcher) {
+console.log('Retrying language selector init...');
+initLanguageSelector();
+} else {
+updateLangButtons();
+}
+}, 500);
+
+// 方式1: DOMContentLoaded
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', initLanguageSelector);
+} else {
+// DOM已经加载完成
+initLanguageSelector();
+}
+
+// 方式2: window.onload 作为备用
+window.addEventListener('load', function() {
+setTimeout(initLanguageSelector, 100);
+});
+
+// 方式3: 延迟检查作为最后备用
+setTimeout(function() {
 const langBtn = document.getElementById('langSelectBtn');
-if (langBtn) {
-// 同时支持 click 和 touchend，确保在所有钱包中都能触发
-langBtn.addEventListener('click', function(e) {
-e.stopPropagation();
-toggleLangDropdown();
-});
-langBtn.addEventListener('touchend', function(e) {
-e.preventDefault();
-e.stopPropagation();
-toggleLangDropdown();
-}, {passive: false});
-// 兼容某些TP钱包的 touchstart 行为
-langBtn.addEventListener('touchstart', function(e) {
-e.stopPropagation();
-}, {passive: true});
+if (!langBtn) {
+console.log('Retrying language selector init...');
+initLanguageSelector();
 }
-
-// 绑定语言选项点击事件 - 增强TP钱包兼容性
-document.querySelectorAll('.custom-lang-option').forEach(function(option) {
-option.addEventListener('click', function(e) {
-e.stopPropagation();
-const lang = this.getAttribute('data-lang');
-if (lang) {
-selectLang(lang);
-}
-});
-option.addEventListener('touchend', function(e) {
-e.preventDefault();
-e.stopPropagation();
-const lang = this.getAttribute('data-lang');
-if (lang) {
-selectLang(lang);
-}
-}, {passive: false});
-option.addEventListener('touchstart', function(e) {
-e.stopPropagation();
-}, {passive: true});
-});
-
-// 点击其他地方关闭下拉菜单 - 增强TP钱包兼容性
-document.addEventListener('click', function(e) {
-const wrapper = document.getElementById('langDropdownWrapper');
-const list = document.getElementById('langDropdownList');
-if (wrapper && !wrapper.contains(e.target)) {
-list.style.display = 'none';
-}
-}, true);
-
-// 触摸事件关闭 - 特别针对TP钱包
-document.addEventListener('touchend', function(e) {
-const wrapper = document.getElementById('langDropdownWrapper');
-const list = document.getElementById('langDropdownList');
-if (wrapper && !wrapper.contains(e.target)) {
-list.style.display = 'none';
-}
-});
-});
+}, 500);
 </script>
 
 <div class="container">
@@ -901,28 +915,22 @@ list.style.display = 'none';
 <div class="btn-group">
 <button class="btn btn-primary" onclick="connectWallet()" data-i18n="connectWallet">Connect Wallet</button>
 </div>
-<!-- 自定义语言选择器 - 兼容所有钱包 -->
-<div id="langDropdownWrapper" class="custom-lang-dropdown" style="margin-top: 10px; position: relative; z-index: 100;">
-<div id="langSelectBtn" class="custom-lang-btn">
-<span id="currentLangText">🌐 English</span>
-<span class="custom-lang-arrow">▼</span>
-</div>
-<div id="langDropdownList" class="custom-lang-list" style="display: none;">
-<div class="custom-lang-option" data-lang="en">🌐 English</div>
-<div class="custom-lang-option" data-lang="zh-TW">🌐 繁體中文</div>
-<div class="custom-lang-option" data-lang="zh-CN">🌐 简体中文</div>
-<div class="custom-lang-option" data-lang="ja">🌐 日本語</div>
-<div class="custom-lang-option" data-lang="ko">🌐 한국어</div>
-<div class="custom-lang-option" data-lang="vi">🌐 Tiếng Việt</div>
-<div class="custom-lang-option" data-lang="th">🌐 ไทย</div>
-<div class="custom-lang-option" data-lang="id">🌐 Bahasa Indonesia</div>
-<div class="custom-lang-option" data-lang="ms">🌐 Bahasa Malaysia</div>
-<div class="custom-lang-option" data-lang="es">🌐 Español</div>
-<div class="custom-lang-option" data-lang="pt">🌐 Português</div>
-<div class="custom-lang-option" data-lang="ru">🌐 Русский</div>
-<div class="custom-lang-option" data-lang="ar">🌐 العربية</div>
-<div class="custom-lang-option" data-lang="hi">🌐 हिन्दी</div>
-</div>
+<!-- 语言切换按钮组 - TP钱包兼容版 -->
+<div id="langSwitcher" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;">
+<button class="btn-lang" onclick="switchLang('zh-CN')" id="btn-zh-CN" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇨🇳 中文</button>
+<button class="btn-lang" onclick="switchLang('en')" id="btn-en" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇬🇧 EN</button>
+<button class="btn-lang" onclick="switchLang('ja')" id="btn-ja" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇯🇵 日本語</button>
+<button class="btn-lang" onclick="switchLang('ko')" id="btn-ko" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇰🇷 한국어</button>
+<button class="btn-lang" onclick="switchLang('vi')" id="btn-vi" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇻🇳 Tiếng Việt</button>
+<button class="btn-lang" onclick="switchLang('th')" id="btn-th" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇹🇭 ไทย</button>
+<button class="btn-lang" onclick="switchLang('es')" id="btn-es" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇪🇸 ES</button>
+<button class="btn-lang" onclick="switchLang('id')" id="btn-id" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇮🇩 ID</button>
+<button class="btn-lang" onclick="switchLang('ms')" id="btn-ms" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇲🇾 MS</button>
+<button class="btn-lang" onclick="switchLang('pt')" id="btn-pt" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇵🇹 PT</button>
+<button class="btn-lang" onclick="switchLang('ru')" id="btn-ru" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇷🇺 RU</button>
+<button class="btn-lang" onclick="switchLang('ar')" id="btn-ar" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇸🇦 AR</button>
+<button class="btn-lang" onclick="switchLang('hi')" id="btn-hi" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇮🇳 HI</button>
+<button class="btn-lang" onclick="switchLang('zh-TW')" id="btn-zh-TW" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇭🇰 繁體</button>
 </div>
 <!-- 隐藏的原select，用于兼容其他逻辑 -->
 <select id="langSelect" style="display:none;">
