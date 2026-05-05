@@ -747,24 +747,78 @@ flex-wrap: wrap;
 }
 }
 
-/* TP钱包使用原生select样式 */
-.is-tpwallet .lang-dropdown-custom select,
-.is-tpwallet .lang-dropdown-custom::after {
-all: initial !important;
-display: block !important;
+/* 自定义语言下拉菜单 - 全钱包兼容 */
+.custom-lang-dropdown {
+width: 180px;
+margin: 10px auto;
+position: relative;
+z-index: 100;
+}
+
+.custom-lang-btn {
+background: rgba(255,255,255,0.1);
+border: 1px solid rgba(255,255,255,0.2);
+border-radius: 8px;
+color: #fff;
+padding: 10px 16px;
+font-size: 14px;
+cursor: pointer;
+display: flex;
+justify-content: space-between;
+align-items: center;
+user-select: none;
+-webkit-tap-highlight-color: transparent;
+}
+
+.custom-lang-btn:hover {
+background: rgba(255,255,255,0.15);
+border-color: rgba(102,126,234,0.5);
+}
+
+.custom-lang-arrow {
+font-size: 10px;
+margin-left: 8px;
+}
+
+.custom-lang-list {
+position: absolute;
+top: 100%;
+left: 0;
+right: 0;
+margin-top: 4px;
+background: #1a1f3a;
+border: 1px solid rgba(255,255,255,0.2);
+border-radius: 8px;
+overflow: hidden;
+max-height: 300px;
+overflow-y: auto;
+box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+z-index: 1001;
+}
+
+.custom-lang-option {
+padding: 10px 16px;
+cursor: pointer;
+color: #fff;
+transition: background 0.2s;
+}
+
+.custom-lang-option:hover {
+background: rgba(102,126,234,0.3);
+}
+
+.custom-lang-option:active {
+background: rgba(102,126,234,0.5);
 }
 </style>
 </head>
 <body>
 <script>
-// 检测TP钱包并应用特殊样式
+// 语言选择器初始化
 (function() {
-const ua = navigator.userAgent.toLowerCase();
-
-if (ua.includes('tokenpocket')) {
-document.body.classList.add('is-tpwallet');
-// TP钱包有自己的语言设置，隐藏网页的语言选择器
-document.getElementById('langDropdownWrapper')?.style.setProperty('display', 'none');
+const savedLang = localStorage.getItem('xyl_lang') || 'zh-CN';
+if (savedLang) {
+setLanguage(savedLang);
 }
 })();
 </script>
@@ -783,24 +837,46 @@ document.getElementById('langDropdownWrapper')?.style.setProperty('display', 'no
 <div class="btn-group">
 <button class="btn btn-primary" onclick="connectWallet()" data-i18n="connectWallet">Connect Wallet</button>
 </div>
-<div id="langDropdownWrapper" class="lang-dropdown-custom" style="margin-top: 10px; position: relative; z-index: 100;">
-<select id="langSelect" onchange="setLanguage(this.value); applyTranslations();">
-<option value="en">🌐 English</option>
-<option value="zh-TW">🌐 繁體中文</option>
-<option value="zh-CN">🌐 简体中文</option>
-<option value="ja">🌐 日本語</option>
-<option value="ko">🌐 한국어</option>
-<option value="vi">🌐 Tiếng Việt</option>
-<option value="th">🌐 ไทย</option>
-<option value="id">🌐 Bahasa Indonesia</option>
-<option value="ms">🌐 Bahasa Malaysia</option>
-<option value="es">🌐 Español</option>
-<option value="pt">🌐 Português</option>
-<option value="ru">🌐 Русский</option>
-<option value="ar">🌐 العربية</option>
-<option value="hi">🌐 हिन्दी</option>
-</select>
+<!-- 自定义语言选择器 - 兼容所有钱包 -->
+<div id="langDropdownWrapper" class="custom-lang-dropdown" style="margin-top: 10px; position: relative; z-index: 100;">
+<div id="langSelectBtn" class="custom-lang-btn" onclick="toggleLangDropdown()">
+<span id="currentLangText">🌐 English</span>
+<span class="custom-lang-arrow">▼</span>
 </div>
+<div id="langDropdownList" class="custom-lang-list" style="display: none;">
+<div class="custom-lang-option" onclick="selectLang('en')">🌐 English</div>
+<div class="custom-lang-option" onclick="selectLang('zh-TW')">🌐 繁體中文</div>
+<div class="custom-lang-option" onclick="selectLang('zh-CN')">🌐 简体中文</div>
+<div class="custom-lang-option" onclick="selectLang('ja')">🌐 日本語</div>
+<div class="custom-lang-option" onclick="selectLang('ko')">🌐 한국어</div>
+<div class="custom-lang-option" onclick="selectLang('vi')">🌐 Tiếng Việt</div>
+<div class="custom-lang-option" onclick="selectLang('th')">🌐 ไทย</div>
+<div class="custom-lang-option" onclick="selectLang('id')">🌐 Bahasa Indonesia</div>
+<div class="custom-lang-option" onclick="selectLang('ms')">🌐 Bahasa Malaysia</div>
+<div class="custom-lang-option" onclick="selectLang('es')">🌐 Español</div>
+<div class="custom-lang-option" onclick="selectLang('pt')">🌐 Português</div>
+<div class="custom-lang-option" onclick="selectLang('ru')">🌐 Русский</div>
+<div class="custom-lang-option" onclick="selectLang('ar')">🌐 العربية</div>
+<div class="custom-lang-option" onclick="selectLang('hi')">🌐 हिन्दी</div>
+</div>
+</div>
+<!-- 隐藏的原select，用于兼容其他逻辑 -->
+<select id="langSelect" style="display:none;">
+<option value="en">English</option>
+<option value="zh-TW">繁體中文</option>
+<option value="zh-CN">简体中文</option>
+<option value="ja">日本語</option>
+<option value="ko">한국어</option>
+<option value="vi">Tiếng Việt</option>
+<option value="th">ไทย</option>
+<option value="id">Bahasa Indonesia</option>
+<option value="ms">Bahasa Malaysia</option>
+<option value="es">Español</option>
+<option value="pt">Português</option>
+<option value="ru">Русский</option>
+<option value="ar">العربية</option>
+<option value="hi">हिन्दी</option>
+</select>
 <div class="wallet-section" id="walletSection"></div>
 
 <div class="hero-title">
@@ -1010,34 +1086,6 @@ document.getElementById('langDropdownWrapper')?.style.setProperty('display', 'no
 
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 <script>
-// 移动端下拉框兼容性处理
-document.addEventListener('DOMContentLoaded', function() {
-const langSelect = document.getElementById('langSelect');
-if (langSelect) {
-// 添加触摸事件支持
-langSelect.addEventListener('touchstart', function(e) {
-e.stopPropagation();
-}, { passive: true });
-
-langSelect.addEventListener('touchend', function(e) {
-e.preventDefault();
-this.focus();
-}, { passive: false });
-
-// 确保select元素可点击
-langSelect.style.pointerEvents = 'auto';
-langSelect.style.webkitTapHighlightColor = 'rgba(102,126,234,0.3)';
-
-// 尝试触发原生选择器
-if ('ontouchstart' in window) {
-langSelect.addEventListener('click', function(e) {
-if (e.pointerType === 'touch' || e.originalEvent && e.originalEvent.touches) {
-this.focus();
-}
-});
-}
-}
-});
 const CONFIG = {
 BSC_RPC: "https://bsc-dataseed.binance.org/",
 CHAIN_ID: 56,
@@ -2207,7 +2255,49 @@ function setLanguage(lang) {
 currentLang = lang;
 localStorage.setItem('xyl_lang', lang);
 document.getElementById('langSelect').value = lang;
+// 更新按钮文字
+const langNames = {
+'en': '🌐 English',
+'zh-TW': '🌐 繁體中文',
+'zh-CN': '🌐 简体中文',
+'ja': '🌐 日本語',
+'ko': '🌐 한국어',
+'vi': '🌐 Tiếng Việt',
+'th': '🌐 ไทย',
+'id': '🌐 Bahasa Indonesia',
+'ms': '🌐 Bahasa Malaysia',
+'es': '🌐 Español',
+'pt': '🌐 Português',
+'ru': '🌐 Русский',
+'ar': '🌐 العربية',
+'hi': '🌐 हिन्दी'
+};
+document.getElementById('currentLangText').textContent = langNames[lang] || '🌐 English';
 applyTranslations();
+}
+
+// 自定义下拉菜单功能
+function toggleLangDropdown() {
+const list = document.getElementById('langDropdownList');
+if (list.style.display === 'none') {
+list.style.display = 'block';
+} else {
+list.style.display = 'none';
+}
+}
+
+// 点击其他地方关闭下拉菜单
+document.addEventListener('click', function(e) {
+const dropdown = document.getElementById('langDropdownWrapper');
+const list = document.getElementById('langDropdownList');
+if (!dropdown.contains(e.target)) {
+list.style.display = 'none';
+}
+});
+
+function selectLang(lang) {
+setLanguage(lang);
+document.getElementById('langDropdownList').style.display = 'none';
 }
 
 function applyTranslations() {
