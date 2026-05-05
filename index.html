@@ -819,29 +819,25 @@ background: rgba(102,126,234,0.5);
 <body>
 <script>
 // 语言选择器初始化 - 使用多种方式确保TP钱包兼容
-// TP钱包兼容版 - 直接切换语言的函数
-function switchLang(lang) {
-setLanguage(lang);
-updateLangButtons();
+// 语言切换函数
+function onLangChange(value) {
+setLanguage(value);
 }
 
-// 更新语言按钮样式
-function updateLangButtons() {
-const langs = ['zh-CN', 'en', 'ja', 'ko', 'vi', 'th', 'es', 'id', 'ms', 'pt', 'ru', 'ar', 'hi', 'zh-TW'];
-langs.forEach(function(l) {
-const btn = document.getElementById('btn-' + l);
-if (btn) {
-if (l === currentLang) {
-btn.style.background = '#667eea';
-btn.style.color = '#fff';
-btn.style.border = '2px solid #764ba2';
-} else {
-btn.style.background = '#f0f0f0';
-btn.style.color = '#333';
-btn.style.border = '1px solid #ddd';
+// TP钱包兼容：打开语言选择器
+function openLangSelector() {
+const select = document.getElementById('langSelect');
+if (select) {
+// 尝试直接触发select
+try {
+select.focus();
+select.click();
+} catch (e) {
+// 如果click失败，尝试使用focus
+select.focus();
 }
+// 在某些浏览器中，focus后点击其他地方会打开选择器
 }
-});
 }
 
 function initLanguageSelector() {
@@ -849,10 +845,43 @@ function initLanguageSelector() {
 const savedLang = localStorage.getItem('xyl_lang') || 'zh-CN';
 if (savedLang) {
 setLanguage(savedLang);
+document.getElementById('langSelect').value = savedLang;
+updateLangDisplay(savedLang);
 }
-updateLangButtons();
 console.log('Language selector initialized!');
 }
+
+// 更新语言显示文字
+function updateLangDisplay(lang) {
+const displayEl = document.getElementById('currentLangDisplay');
+if (displayEl) {
+const langNames = {
+'en': '🌐 English',
+'zh-TW': '🌐 繁體中文',
+'zh-CN': '🌐 简体中文',
+'ja': '🌐 日本語',
+'ko': '🌐 한국어',
+'vi': '🌐 Tiếng Việt',
+'th': '🌐 ไทย',
+'id': '🌐 Bahasa Indonesia',
+'ms': '🌐 Bahasa Malaysia',
+'es': '🌐 Español',
+'pt': '🌐 Português',
+'ru': '🌐 Русский',
+'ar': '🌐 العربية',
+'hi': '🌐 हिन्दी'
+};
+displayEl.textContent = langNames[lang] || '🌐 English';
+}
+}
+
+// 覆盖 setLanguage 函数来同时更新显示
+const originalSetLanguage = setLanguage;
+setLanguage = function(lang) {
+originalSetLanguage(lang);
+updateLangDisplay(lang);
+document.getElementById('langSelect').value = lang;
+};
 
 // 方式1: DOMContentLoaded
 if (document.readyState === 'loading') {
@@ -866,17 +895,6 @@ initLanguageSelector();
 window.addEventListener('load', function() {
 setTimeout(initLanguageSelector, 100);
 });
-
-// 方式3: 延迟检查作为最后备用
-setTimeout(function() {
-const switcher = document.getElementById('langSwitcher');
-if (!switcher) {
-console.log('Retrying language selector init...');
-initLanguageSelector();
-} else {
-updateLangButtons();
-}
-}, 500);
 
 // 方式1: DOMContentLoaded
 if (document.readyState === 'loading') {
@@ -915,25 +933,14 @@ initLanguageSelector();
 <div class="btn-group">
 <button class="btn btn-primary" onclick="connectWallet()" data-i18n="connectWallet">Connect Wallet</button>
 </div>
-<!-- 语言切换按钮组 - TP钱包兼容版 -->
-<div id="langSwitcher" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;">
-<button class="btn-lang" onclick="switchLang('zh-CN')" id="btn-zh-CN" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇨🇳 中文</button>
-<button class="btn-lang" onclick="switchLang('en')" id="btn-en" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇬🇧 EN</button>
-<button class="btn-lang" onclick="switchLang('ja')" id="btn-ja" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇯🇵 日本語</button>
-<button class="btn-lang" onclick="switchLang('ko')" id="btn-ko" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇰🇷 한국어</button>
-<button class="btn-lang" onclick="switchLang('vi')" id="btn-vi" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇻🇳 Tiếng Việt</button>
-<button class="btn-lang" onclick="switchLang('th')" id="btn-th" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇹🇭 ไทย</button>
-<button class="btn-lang" onclick="switchLang('es')" id="btn-es" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇪🇸 ES</button>
-<button class="btn-lang" onclick="switchLang('id')" id="btn-id" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇮🇩 ID</button>
-<button class="btn-lang" onclick="switchLang('ms')" id="btn-ms" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇲🇾 MS</button>
-<button class="btn-lang" onclick="switchLang('pt')" id="btn-pt" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇵🇹 PT</button>
-<button class="btn-lang" onclick="switchLang('ru')" id="btn-ru" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇷🇺 RU</button>
-<button class="btn-lang" onclick="switchLang('ar')" id="btn-ar" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇸🇦 AR</button>
-<button class="btn-lang" onclick="switchLang('hi')" id="btn-hi" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇮🇳 HI</button>
-<button class="btn-lang" onclick="switchLang('zh-TW')" id="btn-zh-TW" style="padding: 5px 10px; font-size: 12px; border-radius: 5px;">🇭🇰 繁體</button>
+<!-- 语言选择器 - TP钱包兼容版 -->
+<div style="margin-top: 10px; position: relative; z-index: 100;">
+<!-- 显示用的按钮 -->
+<div id="langDisplayBtn" onclick="openLangSelector()" ontouchend="openLangSelector()" style="width: 100%; padding: 8px; font-size: 14px; border-radius: 8px; border: 1px solid #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; cursor: pointer; text-align: center; user-select: none; -webkit-user-select: none;">
+<span id="currentLangDisplay">🌐 简体中文</span> ▼
 </div>
-<!-- 隐藏的原select，用于兼容其他逻辑 -->
-<select id="langSelect" style="display:none;">
+<!-- 隐藏的select元素 -->
+<select id="langSelect" onchange="onLangChange(this.value)" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: -1;">
 <option value="en">English</option>
 <option value="zh-TW">繁體中文</option>
 <option value="zh-CN">简体中文</option>
@@ -949,6 +956,7 @@ initLanguageSelector();
 <option value="ar">العربية</option>
 <option value="hi">हिन्दी</option>
 </select>
+</div>
 <div class="wallet-section" id="walletSection"></div>
 
 <div class="hero-title">
