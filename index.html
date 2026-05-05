@@ -324,6 +324,41 @@ background: linear-gradient(135deg, #ffc107, #e0a800);
 color: #1a1a2e;
 }
 
+.btn-lang {
+background: rgba(255,255,255,0.1);
+border: 1px solid rgba(255,255,255,0.2);
+color: #fff;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.btn-lang:hover {
+background: rgba(255,255,255,0.2);
+}
+
+.lang-dropdown {
+display: flex;
+justify-content: center;
+margin-top: 10px;
+}
+
+.lang-dropdown select {
+background: rgba(255,255,255,0.1);
+border: 1px solid rgba(255,255,255,0.2);
+border-radius: 8px;
+color: #fff;
+padding: 10px 20px;
+font-size: 14px;
+cursor: pointer;
+outline: none;
+min-width: 140px;
+}
+
+.lang-dropdown select:hover {
+background: rgba(255,255,255,0.15);
+}
+
 .btn:hover {
 transform: translateY(-2px);
 box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -691,8 +726,17 @@ flex-wrap: wrap;
 </div>
 
 <div id="beforeConnect">
-<div class="lang-selector-container">
-<select id="langSelect" onchange="setLanguage(this.value); applyTranslations();">
+<div class="btn-group">
+<button class="btn btn-lang" onclick="toggleLangSelector()">
+<span data-i18n="selectLanguage">选择语言</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 4px;">
+<path d="M6 9l6 6 6-6"/>
+</svg>
+</button>
+<button class="btn btn-primary" onclick="connectWallet()" data-i18n="connectWallet">连接钱包</button>
+</div>
+<div id="langSelectorDropdown" class="lang-dropdown hidden">
+<select id="langSelect" onchange="setLanguage(this.value); applyTranslations(); document.getElementById('langSelectorDropdown').classList.add('hidden');">
 <option value="zh-TW">中文</option>
 <option value="en">English</option>
 <option value="ja">日本語</option>
@@ -701,9 +745,7 @@ flex-wrap: wrap;
 <option value="th">ไทย</option>
 </select>
 </div>
-<div class="wallet-section" id="walletSection">
-<button class="connect-btn" onclick="connectWallet()" data-i18n="connectWallet">连接钱包</button>
-</div>
+<div class="wallet-section" id="walletSection"></div>
 
 <div class="hero-title">
 <h1 data-i18n="tokenName">小翼龙</h1>
@@ -928,6 +970,7 @@ pageTitle: '小翼龍 Token',
 tokenName: '小翼龍',
 tokenSlogan: '生態社區共治',
 notConnected: '未連接',
+selectLanguage: '選擇語言',
 connectWallet: '連接錢包',
 disconnectWallet: '斷開連接',
 tabHome: '首頁',
@@ -1012,6 +1055,7 @@ pageTitle: 'XYL Token',
 tokenName: 'XYL',
 tokenSlogan: 'Ecological Community Governance',
 notConnected: 'Not Connected',
+selectLanguage: 'Language',
 connectWallet: 'Connect Wallet',
 disconnectWallet: 'Disconnect',
 tabHome: 'Home',
@@ -1093,6 +1137,7 @@ operationError: 'Operation Error'
 },
 ja: {
 pageTitle: 'XYL トークン',
+selectLanguage: '言語',
 connectWallet: 'ウォレット接続',
 disconnectWallet: '切断',
 tabHome: 'ホーム',
@@ -1168,6 +1213,7 @@ operationError: '操作エラー'
 },
 ko: {
 pageTitle: 'XYL 토큰',
+selectLanguage: '언어',
 connectWallet: '지갑 연결',
 disconnectWallet: '연결 해제',
 tabHome: '홈',
@@ -1243,6 +1289,7 @@ operationError: '작업 오류'
 },
 vi: {
 pageTitle: 'XYL Token',
+selectLanguage: 'Ngôn ngữ',
 connectWallet: 'Kết nối Ví',
 disconnectWallet: 'Ngắt kết nối',
 tabHome: 'Trang chủ',
@@ -1318,6 +1365,7 @@ operationError: 'Lỗi thao tác'
 },
 th: {
 pageTitle: 'XYL Token',
+selectLanguage: 'ภาษา',
 connectWallet: 'เชื่อมต่อกระเป๋า',
 disconnectWallet: 'ตัดการเชื่อมต่อ',
 tabHome: 'หน้าแรก',
@@ -1398,6 +1446,11 @@ let currentLang = localStorage.getItem('xyl_lang') || 'zh-TW';
 function t(key) {
 const langData = I18N[currentLang] || I18N['zh-TW'];
 return langData[key] || key;
+}
+
+function toggleLangSelector() {
+const dropdown = document.getElementById('langSelectorDropdown');
+dropdown.classList.toggle('hidden');
 }
 
 function setLanguage(lang) {
