@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>小翼龙 Token</title>
+<title>Tiny Winged Dragon Token</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>">
 <style>
 * {
@@ -35,6 +35,12 @@ padding: 10px;
 .container {
 padding: 20px;
 }
+}
+
+.top-row {
+display: flex;
+justify-content: flex-end;
+margin-bottom: 12px;
 }
 
 .top-banner {
@@ -648,20 +654,23 @@ color: #fff;
 .tab-nav {
 flex-wrap: wrap;
 }
-.lang-selector {
-margin-left: 0;
-margin-top: 8px;
-width: 100%;
-justify-content: center;
-}
-.lang-selector select {
-width: 100%;
-}
 }
 </style>
 </head>
 <body>
 <div class="container">
+<div class="top-row">
+<div class="lang-selector">
+<select id="langSelect" onchange="setLanguage(this.value); applyTranslations();">
+<option value="zh-TW">中文</option>
+<option value="en">English</option>
+<option value="ja">日本語</option>
+<option value="ko">한국어</option>
+<option value="vi">Tiếng Việt</option>
+<option value="th">ไทย</option>
+</select>
+</div>
+</div>
 <div class="top-banner">
 <img src="150659f2ce7580b3be6b695195574c44_720.jpg" alt="banner">
 </div>
@@ -688,16 +697,6 @@ width: 100%;
 <button class="tab-btn" onclick="switchTab('lock')" data-i18n="tabLock">锁仓</button>
 <button class="tab-btn" onclick="switchTab('referral')" data-i18n="tabReferral">推广</button>
 <button class="tab-btn" onclick="switchTab('info')" data-i18n="tabInfo">我的</button>
-<div class="lang-selector">
-<select id="langSelect" onchange="setLanguage(this.value); applyTranslations();">
-<option value="zh-TW">中文</option>
-<option value="en">English</option>
-<option value="ja">日本語</option>
-<option value="ko">한국어</option>
-<option value="vi">Tiếng Việt</option>
-<option value="th">ไทย</option>
-</select>
-</div>
 </div>
 
 <div class="tab-content active" id="tab-home">
