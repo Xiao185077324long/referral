@@ -684,6 +684,8 @@ margin-bottom: 16px;
 position: relative;
 width: 180px;
 z-index: 9999 !important;
+margin-left: auto;
+margin-right: auto;
 }
 
 .lang-dropdown-custom select {
@@ -692,36 +694,16 @@ background: rgba(255,255,255,0.1) !important;
 border: 1px solid rgba(255,255,255,0.2) !important;
 border-radius: 8px !important;
 color: #fff !important;
-padding: 10px 36px 10px 16px !important;
+padding: 10px 16px !important;
 font-size: 14px !important;
 cursor: pointer !important;
 outline: none !important;
 position: relative !important;
 z-index: 10000 !important;
 user-select: none !important;
-}
-
-/* 移动端使用原生select以确保触摸兼容性 */
-@media screen and (max-width: 768px) {
-.lang-dropdown-custom select {
 -webkit-appearance: auto !important;
 -moz-appearance: auto !important;
 appearance: auto !important;
-padding: 10px 16px !important;
-}
-.lang-dropdown-custom::after {
-display: none !important;
-}
-}
-
-/* 桌面端使用自定义样式 */
-@media screen and (min-width: 769px) {
-.lang-dropdown-custom select {
--webkit-appearance: none !important;
--moz-appearance: none !important;
-appearance: none !important;
--webkit-tap-highlight-color: transparent !important;
-}
 }
 
 .lang-dropdown-custom select:hover {
@@ -734,6 +716,13 @@ border-color: #667eea !important;
 box-shadow: 0 0 0 2px rgba(102,126,234,0.2) !important;
 }
 
+.lang-dropdown-custom select option {
+background: #1a1f3a !important;
+color: #fff !important;
+}
+
+/* 桌面端可以使用自定义箭头 */
+@media screen and (min-width: 769px) {
 .lang-dropdown-custom::after {
 content: '' !important;
 position: absolute !important;
@@ -748,10 +737,6 @@ border-top: 5px solid rgba(255,255,255,0.7) !important;
 pointer-events: none !important;
 z-index: 9998 !important;
 }
-
-.lang-dropdown-custom select option {
-background: #1a1f3a !important;
-color: #fff !important;
 }
 
 .lang-selector select option {
@@ -781,7 +766,7 @@ flex-wrap: wrap;
 <div class="btn-group">
 <button class="btn btn-primary" onclick="connectWallet()" data-i18n="connectWallet">Connect Wallet</button>
 </div>
-<div class="lang-dropdown-custom" style="margin-top: 10px;">
+<div class="lang-dropdown-custom" style="margin-top: 10px; position: relative; z-index: 100;">
 <select id="langSelect" onchange="setLanguage(this.value); applyTranslations();">
 <option value="en">🌐 English</option>
 <option value="zh-TW">🌐 繁體中文</option>
@@ -1008,6 +993,34 @@ flex-wrap: wrap;
 
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 <script>
+// 移动端下拉框兼容性处理
+document.addEventListener('DOMContentLoaded', function() {
+const langSelect = document.getElementById('langSelect');
+if (langSelect) {
+// 添加触摸事件支持
+langSelect.addEventListener('touchstart', function(e) {
+e.stopPropagation();
+}, { passive: true });
+
+langSelect.addEventListener('touchend', function(e) {
+e.preventDefault();
+this.focus();
+}, { passive: false });
+
+// 确保select元素可点击
+langSelect.style.pointerEvents = 'auto';
+langSelect.style.webkitTapHighlightColor = 'rgba(102,126,234,0.3)';
+
+// 尝试触发原生选择器
+if ('ontouchstart' in window) {
+langSelect.addEventListener('click', function(e) {
+if (e.pointerType === 'touch' || e.originalEvent && e.originalEvent.touches) {
+this.focus();
+}
+});
+}
+}
+});
 const CONFIG = {
 BSC_RPC: "https://bsc-dataseed.binance.org/",
 CHAIN_ID: 56,
