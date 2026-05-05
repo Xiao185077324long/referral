@@ -391,6 +391,7 @@ transform: translateX(-50%) translateY(0);
 .toast.error { border-left: 3px solid #ff4757; }
 
 .refresh-btn {
+display: none;
 position: fixed;
 bottom: 24px;
 right: 24px;
@@ -402,7 +403,6 @@ border: none;
 color: #fff;
 cursor: pointer;
 box-shadow: 0 4px 20px rgba(102,126,234,0.4);
-display: flex;
 align-items: center;
 justify-content: center;
 }
@@ -1828,6 +1828,9 @@ modal.style.display = 'flex';
 document.getElementById('refreshModalOk').onclick = function() {
     modal.style.display = 'none';
 };
+setTimeout(() => {
+    modal.style.display = 'none';
+}, 5000);
 } catch (e) {
 console.error('刷新失败:', e);
 }
