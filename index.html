@@ -698,12 +698,30 @@ cursor: pointer !important;
 outline: none !important;
 position: relative !important;
 z-index: 10000 !important;
+user-select: none !important;
+}
+
+/* 移动端使用原生select以确保触摸兼容性 */
+@media screen and (max-width: 768px) {
+.lang-dropdown-custom select {
+-webkit-appearance: auto !important;
+-moz-appearance: auto !important;
+appearance: auto !important;
+padding: 10px 16px !important;
+}
+.lang-dropdown-custom::after {
+display: none !important;
+}
+}
+
+/* 桌面端使用自定义样式 */
+@media screen and (min-width: 769px) {
+.lang-dropdown-custom select {
 -webkit-appearance: none !important;
 -moz-appearance: none !important;
 appearance: none !important;
 -webkit-tap-highlight-color: transparent !important;
-touch-action: manipulation !important;
-user-select: none !important;
+}
 }
 
 .lang-dropdown-custom select:hover {
