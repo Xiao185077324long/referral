@@ -768,6 +768,8 @@ justify-content: space-between;
 align-items: center;
 user-select: none;
 -webkit-tap-highlight-color: transparent;
+touch-action: manipulation;
+-ms-touch-action: manipulation;
 }
 
 .custom-lang-btn:hover {
@@ -801,6 +803,8 @@ padding: 10px 16px;
 cursor: pointer;
 color: #fff;
 transition: background 0.2s;
+touch-action: manipulation;
+-ms-touch-action: manipulation;
 }
 
 .custom-lang-option:hover {
@@ -814,13 +818,50 @@ background: rgba(102,126,234,0.5);
 </head>
 <body>
 <script>
-// 语言选择器初始化
-(function() {
+// 语言选择器初始化 - DOM加载完成后执行
+document.addEventListener('DOMContentLoaded', function() {
+// 初始化语言
 const savedLang = localStorage.getItem('xyl_lang') || 'zh-CN';
 if (savedLang) {
 setLanguage(savedLang);
 }
-})();
+
+// 绑定按钮点击事件
+const langBtn = document.getElementById('langSelectBtn');
+if (langBtn) {
+langBtn.addEventListener('click', toggleLangDropdown);
+langBtn.addEventListener('touchend', function(e) {
+e.preventDefault();
+toggleLangDropdown();
+});
+}
+
+// 绑定语言选项点击事件
+document.querySelectorAll('.custom-lang-option').forEach(function(option) {
+option.addEventListener('click', function() {
+const lang = this.getAttribute('data-lang');
+if (lang) {
+selectLang(lang);
+}
+});
+option.addEventListener('touchend', function(e) {
+e.preventDefault();
+const lang = this.getAttribute('data-lang');
+if (lang) {
+selectLang(lang);
+}
+});
+});
+
+// 点击其他地方关闭下拉菜单
+document.addEventListener('click', function(e) {
+const wrapper = document.getElementById('langDropdownWrapper');
+const list = document.getElementById('langDropdownList');
+if (wrapper && !wrapper.contains(e.target)) {
+list.style.display = 'none';
+}
+});
+});
 </script>
 
 <div class="container">
@@ -839,25 +880,25 @@ setLanguage(savedLang);
 </div>
 <!-- 自定义语言选择器 - 兼容所有钱包 -->
 <div id="langDropdownWrapper" class="custom-lang-dropdown" style="margin-top: 10px; position: relative; z-index: 100;">
-<div id="langSelectBtn" class="custom-lang-btn" onclick="toggleLangDropdown()">
+<div id="langSelectBtn" class="custom-lang-btn">
 <span id="currentLangText">🌐 English</span>
 <span class="custom-lang-arrow">▼</span>
 </div>
 <div id="langDropdownList" class="custom-lang-list" style="display: none;">
-<div class="custom-lang-option" onclick="selectLang('en')">🌐 English</div>
-<div class="custom-lang-option" onclick="selectLang('zh-TW')">🌐 繁體中文</div>
-<div class="custom-lang-option" onclick="selectLang('zh-CN')">🌐 简体中文</div>
-<div class="custom-lang-option" onclick="selectLang('ja')">🌐 日本語</div>
-<div class="custom-lang-option" onclick="selectLang('ko')">🌐 한국어</div>
-<div class="custom-lang-option" onclick="selectLang('vi')">🌐 Tiếng Việt</div>
-<div class="custom-lang-option" onclick="selectLang('th')">🌐 ไทย</div>
-<div class="custom-lang-option" onclick="selectLang('id')">🌐 Bahasa Indonesia</div>
-<div class="custom-lang-option" onclick="selectLang('ms')">🌐 Bahasa Malaysia</div>
-<div class="custom-lang-option" onclick="selectLang('es')">🌐 Español</div>
-<div class="custom-lang-option" onclick="selectLang('pt')">🌐 Português</div>
-<div class="custom-lang-option" onclick="selectLang('ru')">🌐 Русский</div>
-<div class="custom-lang-option" onclick="selectLang('ar')">🌐 العربية</div>
-<div class="custom-lang-option" onclick="selectLang('hi')">🌐 हिन्दी</div>
+<div class="custom-lang-option" data-lang="en">🌐 English</div>
+<div class="custom-lang-option" data-lang="zh-TW">🌐 繁體中文</div>
+<div class="custom-lang-option" data-lang="zh-CN">🌐 简体中文</div>
+<div class="custom-lang-option" data-lang="ja">🌐 日本語</div>
+<div class="custom-lang-option" data-lang="ko">🌐 한국어</div>
+<div class="custom-lang-option" data-lang="vi">🌐 Tiếng Việt</div>
+<div class="custom-lang-option" data-lang="th">🌐 ไทย</div>
+<div class="custom-lang-option" data-lang="id">🌐 Bahasa Indonesia</div>
+<div class="custom-lang-option" data-lang="ms">🌐 Bahasa Malaysia</div>
+<div class="custom-lang-option" data-lang="es">🌐 Español</div>
+<div class="custom-lang-option" data-lang="pt">🌐 Português</div>
+<div class="custom-lang-option" data-lang="ru">🌐 Русский</div>
+<div class="custom-lang-option" data-lang="ar">🌐 العربية</div>
+<div class="custom-lang-option" data-lang="hi">🌐 हिन्दी</div>
 </div>
 </div>
 <!-- 隐藏的原select，用于兼容其他逻辑 -->
