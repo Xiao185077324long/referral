@@ -616,6 +616,48 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 .log-success { color: #00d26a; }
 .log-error { color: #ff6b6b; }
 .log-info { color: #667eea; }
+
+.lang-selector {
+margin-left: auto;
+display: flex;
+align-items: center;
+}
+
+.lang-selector select {
+background: rgba(255,255,255,0.1);
+border: 1px solid rgba(255,255,255,0.2);
+border-radius: 8px;
+color: #fff;
+padding: 6px 12px;
+font-size: 13px;
+cursor: pointer;
+outline: none;
+}
+
+.lang-selector select:hover {
+background: rgba(255,255,255,0.15);
+border-color: rgba(255,255,255,0.3);
+}
+
+.lang-selector select option {
+background: #1a1f3a;
+color: #fff;
+}
+
+@media (max-width: 600px) {
+.tab-nav {
+flex-wrap: wrap;
+}
+.lang-selector {
+margin-left: 0;
+margin-top: 8px;
+width: 100%;
+justify-content: center;
+}
+.lang-selector select {
+width: 100%;
+}
+}
 </style>
 </head>
 <body>
@@ -626,83 +668,93 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 
 <div class="status-bar">
 <div class="status-dot" id="statusDot"></div>
-<span class="status-text" id="statusText">未连接</span>
+<span class="status-text" id="statusText" data-i18n="notConnected">未连接</span>
 </div>
 
 <div id="beforeConnect">
 <div class="wallet-section" id="walletSection">
-<button class="connect-btn" onclick="connectWallet()">连接钱包</button>
+<button class="connect-btn" onclick="connectWallet()" data-i18n="connectWallet">连接钱包</button>
 </div>
 
 <div class="hero-title">
-<h1>小翼龙</h1>
-<h2>生态社区共治</h2>
+<h1 data-i18n="tokenName">小翼龙</h1>
+<h2 data-i18n="tokenSlogan">生态社区共治</h2>
 </div>
 </div>
 
 <div id="mainContent" class="hidden">
 <div class="tab-nav">
-<button class="tab-btn active" onclick="switchTab('home')">首页</button>
-<button class="tab-btn" onclick="switchTab('lock')">锁仓</button>
-<button class="tab-btn" onclick="switchTab('referral')">推广</button>
-<button class="tab-btn" onclick="switchTab('info')">我的</button>
+<button class="tab-btn active" onclick="switchTab('home')" data-i18n="tabHome">首页</button>
+<button class="tab-btn" onclick="switchTab('lock')" data-i18n="tabLock">锁仓</button>
+<button class="tab-btn" onclick="switchTab('referral')" data-i18n="tabReferral">推广</button>
+<button class="tab-btn" onclick="switchTab('info')" data-i18n="tabInfo">我的</button>
+<div class="lang-selector">
+<select id="langSelect" onchange="setLanguage(this.value); applyTranslations();">
+<option value="zh">中文</option>
+<option value="en">English</option>
+<option value="ja">日本語</option>
+<option value="ko">한국어</option>
+<option value="vi">Tiếng Việt</option>
+<option value="th">ไทย</option>
+</select>
+</div>
 </div>
 
 <div class="tab-content active" id="tab-home">
 <div class="card">
-<div class="card-title">阶段进度</div>
+<div class="card-title" data-i18n="phaseProgress">阶段进度</div>
 <div class="phase-grid">
 <div class="phase-item" id="phase1">
-<div class="phase-num">阶段1</div>
-<div class="phase-label">1% 奖励</div>
+<div class="phase-num" data-i18n="phase1">阶段1</div>
+<div class="phase-label" data-i18n="reward1Percent">1% 奖励</div>
 </div>
 <div class="phase-item" id="phase2">
-<div class="phase-num">阶段2</div>
-<div class="phase-label">3% 奖励</div>
+<div class="phase-num" data-i18n="phase2">阶段2</div>
+<div class="phase-label" data-i18n="reward3Percent">3% 奖励</div>
 </div>
 <div class="phase-item" id="phase3">
-<div class="phase-num">阶段3</div>
-<div class="phase-label">5% 奖励</div>
+<div class="phase-num" data-i18n="phase3">阶段3</div>
+<div class="phase-label" data-i18n="reward5Percent">5% 奖励</div>
 </div>
 </div>
 </div>
 
 <div class="card">
-<div class="card-title">当前活跃阶段奖励说明</div>
+<div class="card-title" data-i18n="currentPhaseRewardDesc">当前活跃阶段奖励说明</div>
 <div class="phase-reward-card">
 <div class="tier-table">
 <div class="tier-row tier-header">
-<span class="tier-label">档位</span>
-<span class="tier-superior">上级门槛</span>
-<span class="tier-subordinate">下级门槛</span>
+<span class="tier-label" data-i18n="tier">档位</span>
+<span class="tier-superior" data-i18n="superiorThreshold">上级门槛</span>
+<span class="tier-subordinate" data-i18n="subordinateThreshold">下级门槛</span>
 </div>
 <div class="tier-row">
-<span class="tier-label">一档</span>
-<span class="tier-superior">300万</span>
-<span class="tier-subordinate">50万</span>
+<span class="tier-label" data-i18n="tierOne">一档</span>
+<span class="tier-superior" data-i18n="threshold300M">300万</span>
+<span class="tier-subordinate" data-i18n="threshold50M">50万</span>
 </div>
 <div class="tier-row">
-<span class="tier-label">二档</span>
-<span class="tier-superior">150万</span>
-<span class="tier-subordinate">80万</span>
+<span class="tier-label" data-i18n="tierTwo">二档</span>
+<span class="tier-superior" data-i18n="threshold150M">150万</span>
+<span class="tier-subordinate" data-i18n="threshold80M">80万</span>
 </div>
 <div class="tier-row">
-<span class="tier-label">三档</span>
-<span class="tier-superior">80万</span>
-<span class="tier-subordinate">10万</span>
+<span class="tier-label" data-i18n="tierThree">三档</span>
+<span class="tier-superior" data-i18n="threshold80M2">80万</span>
+<span class="tier-subordinate" data-i18n="threshold10M">10万</span>
 </div>
 </div>
 </div>
 </div>
 
 <div class="card">
-<div class="card-title">合约数据</div>
+<div class="card-title" data-i18n="contractData">合约数据</div>
 <div class="data-row">
-<span class="data-label">销毁总量</span>
+<span class="data-label" data-i18n="burnedAmount">销毁总量</span>
 <span class="data-value" id="burnedAmount">--</span>
 </div>
 <div class="data-row">
-<span class="data-label">流通供应</span>
+<span class="data-label" data-i18n="circulatingSupply">流通供应</span>
 <span class="data-value" id="circulating">--</span>
 </div>
 </div>
@@ -710,30 +762,30 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 
 <div class="tab-content" id="tab-lock">
 <div class="card">
-<div class="card-title">锁仓</div>
+<div class="card-title" data-i18n="lockData">锁仓</div>
 <div class="lock-grid">
 <div class="lock-card private">
-<div class="lock-label">私募方锁仓总量</div>
+<div class="lock-label" data-i18n="privateLockTotal">私募方锁仓总量</div>
 <div class="lock-value" id="privateLockTotal">--</div>
 </div>
 
 <div class="lock-card private">
-<div class="lock-label">私募方释放总量</div>
+<div class="lock-label" data-i18n="privateReleased">私募方释放总量</div>
 <div class="lock-value" id="privateReleased">--</div>
 </div>
 </div>
 </div>
 
 <div class="card">
-<div class="card-title">项目方数据</div>
+<div class="card-title" data-i18n="projectData">项目方数据</div>
 <div class="lock-grid">
 <div class="lock-card project">
-<div class="lock-label">项目方锁仓总量</div>
+<div class="lock-label" data-i18n="projectLockTotal">项目方锁仓总量</div>
 <div class="lock-value" id="projectLockTotal">--</div>
 </div>
 
 <div class="lock-card project">
-<div class="lock-label">项目方释放总量</div>
+<div class="lock-label" data-i18n="projectReleased">项目方释放总量</div>
 <div class="lock-value" id="projectReleased">--</div>
 </div>
 </div>
@@ -742,31 +794,31 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 
 <div class="tab-content" id="tab-referral">
 <div class="card">
-<div class="card-title">推广链接</div>
+<div class="card-title" data-i18n="referralLink">推广链接</div>
 <div class="input-group">
 <div style="display: flex; gap: 8px;">
-<input type="text" class="input-field" id="referralLink" readonly placeholder="推广链接">
-<button class="btn btn-primary" onclick="copyReferralLink()" style="width: auto; padding: 12px 16px;">复制</button>
+<input type="text" class="input-field" id="referralLink" readonly data-i18n-placeholder="referralLinkPlaceholder" placeholder="推广链接">
+<button class="btn btn-primary" onclick="copyReferralLink()" style="width: auto; padding: 12px 16px;" data-i18n="copyLink">复制</button>
 </div>
 </div>
 <div class="input-group">
-<label class="input-label">绑定推荐人（输入推荐人地址）</label>
+<label class="input-label" data-i18n="bindReferrerLabel">绑定推荐人（输入推荐人地址）</label>
 <div style="display: flex; gap: 8px;">
-<input type="text" class="input-field" id="referrerInput" placeholder="输入推荐人地址">
-<button class="btn btn-primary" onclick="bindReferrer()" style="width: auto; padding: 12px 16px;">绑定</button>
+<input type="text" class="input-field" id="referrerInput" data-i18n-placeholder="referrerPlaceholder" placeholder="输入推荐人地址">
+<button class="btn btn-primary" onclick="bindReferrer()" style="width: auto; padding: 12px 16px;" data-i18n="bindReferrer">绑定</button>
 </div>
 </div>
 <div class="error-box" id="referralError"></div>
 </div>
 
 <div class="card">
-<div class="card-title">推广奖励领取</div>
+<div class="card-title" data-i18n="referralRewardClaim">推广奖励领取</div>
 <div id="downlineList"></div>
 
 <div style="margin-top: 16px;">
 <div class="btn-group">
-<button class="btn btn-primary" onclick="refreshAllDownlines()">一键刷新</button>
-<button class="btn btn-green" onclick="autoClaimAll()">一键领取</button>
+<button class="btn btn-primary" onclick="refreshAllDownlines()" data-i18n="refreshAll">一键刷新</button>
+<button class="btn btn-green" onclick="autoClaimAll()" data-i18n="claimAll">一键领取</button>
 </div>
 
 </div>
@@ -780,41 +832,41 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 
 <div class="tab-content" id="tab-info">
 <div class="card">
-<div class="card-title">我的钱包</div>
+<div class="card-title" data-i18n="myWallet">我的钱包</div>
 <div class="user-grid">
 <div class="user-item">
-<div class="user-label">代币余额</div>
+<div class="user-label" data-i18n="tokenBalance">代币余额</div>
 <div class="user-value" id="userBalance">--</div>
 </div>
 <div class="user-item">
-<div class="user-label">累计DEX买入</div>
+<div class="user-label" data-i18n="totalDexBuy">累计DEX买入</div>
 <div class="user-value" id="dexBuy">--</div>
 </div>
 </div>
 </div>
 
                 <div class="card">
-                    <div class="card-title">持仓状态</div>
+                    <div class="card-title" data-i18n="holdStatus">持仓状态</div>
                     <div class="data-row">
-                        <span class="data-label">当前持仓门槛</span>
+                        <span class="data-label" data-i18n="currentHoldThreshold">当前持仓门槛</span>
                         <span class="data-value" id="holdThreshold">--</span>
                     </div>
                     <div class="data-row">
-                        <span class="data-label">门槛开始时间</span>
+                        <span class="data-label" data-i18n="holdStartTime">门槛开始时间</span>
                         <span class="data-value" id="holdStartTime">--</span>
                     </div>
                     <div class="data-row">
-                        <span class="data-label">24小时解锁时间</span>
+                        <span class="data-label" data-i18n="unlockTime24h">24小时解锁时间</span>
                         <span class="data-value" id="holdEndTime">--</span>
                     </div>
                     <div class="data-row">
-                        <span class="data-label">用户阶段</span>
+                        <span class="data-label" data-i18n="userPhase">用户阶段</span>
                         <span class="data-value" id="userPhase">--</span>
                     </div>
                 </div>
                 
 <div class="btn-group">
-<button class="btn btn-primary" onclick="disconnectWallet()">断开连接</button>
+<button class="btn btn-primary" onclick="disconnectWallet()" data-i18n="disconnectWallet">断开连接</button>
 </div>
 </div>
 </div>
@@ -833,9 +885,9 @@ border-bottom: 1px solid rgba(255,255,255,0.05);
 <div id="errorModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;">
 <div style="background: rgba(30,30,50,0.95); border-radius: 16px; padding: 24px; max-width: 320px; width: 90%; text-align: center; border: 1px solid rgba(255,71,87,0.5);">
 <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
-<div id="errorModalTitle" style="font-size: 16px; font-weight: 600; color: #ff6b6b; margin-bottom: 8px;">操作错误</div>
+<div id="errorModalTitle" data-i18n="operationError" style="font-size: 16px; font-weight: 600; color: #ff6b6b; margin-bottom: 8px;">操作错误</div>
 <div id="errorModalMessage" style="font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 20px; word-break: break-all;"></div>
-<button onclick="closeErrorModal()" style="background: linear-gradient(135deg, #ff4757, #ff6b6b); color: #fff; border: none; padding: 12px 32px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;">确定</button>
+<button onclick="closeErrorModal()" data-i18n="confirm" style="background: linear-gradient(135deg, #ff4757, #ff6b6b); color: #fff; border: none; padding: 12px 32px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;">确定</button>
 </div>
 </div>
 
@@ -850,6 +902,498 @@ LOCK_CONTRACT: "0x0000000000000000000000000000000000000000",
 
 TOKEN_DECIMALS: 18
 };
+
+const I18N = {
+zh: {
+pageTitle: '小翼龙 Token',
+tokenName: '小翼龙',
+tokenSlogan: '生态社区共治',
+notConnected: '未连接',
+connectWallet: '连接钱包',
+disconnectWallet: '断开连接',
+tabHome: '首页',
+tabLock: '锁仓',
+tabReferral: '推广',
+tabInfo: '我的',
+phaseProgress: '阶段进度',
+phase1: '阶段1',
+phase2: '阶段2',
+phase3: '阶段3',
+reward1Percent: '1% 奖励',
+reward3Percent: '3% 奖励',
+reward5Percent: '5% 奖励',
+currentPhaseRewardDesc: '当前活跃阶段奖励说明',
+tier: '档位',
+superiorThreshold: '上级门槛',
+subordinateThreshold: '下级门槛',
+tierOne: '一档',
+tierTwo: '二档',
+tierThree: '三档',
+threshold300M: '300万',
+threshold150M: '150万',
+threshold80M: '80万',
+threshold80M2: '80万',
+threshold50M: '50万',
+threshold10M: '10万',
+contractData: '合约数据',
+burnedAmount: '销毁总量',
+circulatingSupply: '流通供应',
+lockData: '锁仓',
+privateLockTotal: '私募方锁仓总量',
+privateReleased: '私募方释放总量',
+projectData: '项目方数据',
+projectLockTotal: '项目方锁仓总量',
+projectReleased: '项目方释放总量',
+referralLink: '推广链接',
+copyLink: '复制',
+bindReferrer: '绑定',
+bindReferrerLabel: '绑定推荐人（输入推荐人地址）',
+referralLinkPlaceholder: '推广链接',
+referrerPlaceholder: '输入推荐人地址',
+referralRewardClaim: '推广奖励领取',
+refreshAll: '一键刷新',
+claimAll: '一键领取',
+noDownline: '暂无下级',
+notQualified: '未达标',
+claimable: '可领取',
+claimedAll: '已领完',
+myWallet: '我的钱包',
+tokenBalance: '代币余额',
+totalDexBuy: '累计DEX买入',
+holdStatus: '持仓状态',
+currentHoldThreshold: '当前持仓门槛',
+holdStartTime: '门槛开始时间',
+unlockTime24h: '24小时解锁时间',
+userPhase: '用户阶段',
+refreshInfo: '刷新信息',
+lastRefresh: '上次刷新',
+nextRefresh: '下次刷新',
+confirm: '确定',
+installWallet: '请安装 MetaMask、TokenPocket 或其他 Web3 钱包',
+switchToBSC: '请手动切换到 BSC 主网',
+autoBindReferrer: '正在自动绑定推荐人...',
+bindSuccess: '推荐人绑定成功！',
+connectFirst: '请先连接钱包',
+copySuccess: '复制成功！',
+bindSuccessToast: '绑定成功！',
+waitToRefresh: '请等待 {minutes} 分钟后再刷新',
+waitToClaim: '请等待 {minutes} 分钟后再领取',
+noDownlineToClaim: '没有下级可领取',
+startClaiming: '开始一键领取奖励...',
+userCancelled: '用户取消签名，领取终止',
+noClaimableReward: '当前没有可领取的奖励',
+downline: '下级',
+tierClaim: '档',
+claimSuccess: '领取成功',
+claimFailed: '失败',
+operationError: '操作错误'
+},
+en: {
+pageTitle: 'XYL Token',
+tokenName: 'XYL',
+tokenSlogan: 'Ecological Community Governance',
+notConnected: 'Not Connected',
+connectWallet: 'Connect Wallet',
+disconnectWallet: 'Disconnect',
+tabHome: 'Home',
+tabLock: 'Lock',
+tabReferral: 'Referral',
+tabInfo: 'My',
+phaseProgress: 'Phase Progress',
+phase1: 'Phase 1',
+phase2: 'Phase 2',
+phase3: 'Phase 3',
+reward1Percent: '1% Reward',
+reward3Percent: '3% Reward',
+reward5Percent: '5% Reward',
+currentPhaseRewardDesc: 'Current Phase Reward Description',
+tier: 'Tier',
+superiorThreshold: 'Superior Threshold',
+subordinateThreshold: 'Subordinate Threshold',
+tierOne: 'Tier 1',
+tierTwo: 'Tier 2',
+tierThree: 'Tier 3',
+threshold300M: '3M',
+threshold150M: '1.5M',
+threshold80M: '800K',
+threshold80M2: '800K',
+threshold50M: '500K',
+threshold10M: '100K',
+contractData: 'Contract Data',
+burnedAmount: 'Burned Amount',
+circulatingSupply: 'Circulating Supply',
+lockData: 'Lock',
+privateLockTotal: 'Private Lock Total',
+privateReleased: 'Private Released Total',
+projectData: 'Project Data',
+projectLockTotal: 'Project Lock Total',
+projectReleased: 'Project Released Total',
+referralLink: 'Referral Link',
+copyLink: 'Copy',
+bindReferrer: 'Bind',
+bindReferrerLabel: 'Bind Referrer (Enter referrer address)',
+referralLinkPlaceholder: 'Referral Link',
+referrerPlaceholder: 'Enter Referrer Address',
+referralRewardClaim: 'Referral Reward Claim',
+refreshAll: 'Refresh All',
+claimAll: 'Claim All',
+noDownline: 'No Downline',
+notQualified: 'Not Qualified',
+claimable: 'Claimable',
+claimedAll: 'Claimed',
+myWallet: 'My Wallet',
+tokenBalance: 'Token Balance',
+totalDexBuy: 'Total DEX Buy',
+holdStatus: 'Hold Status',
+currentHoldThreshold: 'Current Hold Threshold',
+holdStartTime: 'Hold Start Time',
+unlockTime24h: '24h Unlock Time',
+userPhase: 'User Phase',
+refreshInfo: 'Refresh Info',
+lastRefresh: 'Last Refresh',
+nextRefresh: 'Next Refresh',
+confirm: 'Confirm',
+installWallet: 'Please install MetaMask, TokenPocket or other Web3 wallet',
+switchToBSC: 'Please switch to BSC Mainnet manually',
+autoBindReferrer: 'Auto binding referrer...',
+bindSuccess: 'Referrer bound successfully!',
+connectFirst: 'Please connect wallet first',
+copySuccess: 'Copy success!',
+bindSuccessToast: 'Bind success!',
+waitToRefresh: 'Please wait {minutes} minutes before refreshing',
+waitToClaim: 'Please wait {minutes} minutes before claiming',
+noDownlineToClaim: 'No downline to claim',
+startClaiming: 'Starting one-click claim...',
+userCancelled: 'User cancelled signature, claim stopped',
+noClaimableReward: 'No claimable reward currently',
+downline: 'downline',
+tierClaim: 'tier',
+claimSuccess: 'Claim success',
+claimFailed: 'Failed',
+operationError: 'Operation Error'
+},
+ja: {
+pageTitle: 'XYL トークン',
+connectWallet: 'ウォレット接続',
+disconnectWallet: '切断',
+tabHome: 'ホーム',
+tabLock: 'ロック',
+tabReferral: '紹介',
+tabInfo: 'マイ',
+phaseProgress: '段階進捗',
+phase1: '段階1',
+phase2: '段階2',
+phase3: '段階3',
+reward1Percent: '1% 報酬',
+reward3Percent: '3% 報酬',
+reward5Percent: '5% 報酬',
+currentPhaseRewardDesc: '現在のア актив段階報酬説明',
+tier: 'グレード',
+superiorThreshold: '上位者门槛',
+subordinateThreshold: '下位者门槛',
+tierOne: 'グレード1',
+tierTwo: 'グレード2',
+tierThree: 'グレード3',
+threshold300M: '300万',
+threshold150M: '150万',
+threshold80M: '80万',
+threshold50M: '50万',
+threshold10M: '10万',
+contractData: 'コントラクトデータ',
+burnedAmount: 'バーン量',
+circulatingSupply: '流通供給量',
+lockData: 'ロック',
+projectData: 'プロジェクトデータ',
+referralLink: '紹介リンク',
+copyLink: 'コピー',
+bindReferrer: 'バインド',
+referralLinkPlaceholder: '紹介リンク',
+referrerPlaceholder: '紹介者アドレスを入力',
+referralRewardClaim: '紹介報酬請求',
+refreshAll: '一括更新',
+claimAll: '一括請求',
+noDownline: '下位者なし',
+notQualified: '未達',
+claimable: '請求可能',
+claimedAll: '請求済',
+myWallet: 'マイウォレット',
+tokenBalance: 'トークン残高',
+totalDexBuy: 'DEX購入合計',
+holdStatus: '保有状態',
+currentHoldThreshold: '現在保有门槛',
+holdStartTime: '保有開始時間',
+unlockTime24h: '24時間解除時間',
+userPhase: 'ユーザー段階',
+refreshInfo: '更新情報',
+lastRefresh: '前回更新',
+nextRefresh: '次回更新',
+confirm: '確認',
+installWallet: 'MetaMask、TokenPocketなどのWeb3ウォレットをインストールしてください',
+switchToBSC: 'BSCメインネットに手動で切り替えてください',
+autoBindReferrer: '紹介者を自動バインド中...',
+bindSuccess: '紹介者バインド成功！',
+connectFirst: '先にウォレットを接続してください',
+copySuccess: 'コピー成功！',
+bindSuccessToast: 'バインド成功！',
+waitToRefresh: '更新まで{minutes}分お待ちください',
+waitToClaim: '請求まで{minutes}分お待ちください',
+noDownlineToClaim: '請求可能な下位者がいません',
+startClaiming: '一括請求を開始...',
+userCancelled: 'ユーザーがサインをキャンセル、請求中止',
+noClaimableReward: '現在請求可能な報酬はありません',
+downline: '下位者',
+tierClaim: 'グレード',
+claimSuccess: '請求成功',
+claimFailed: '失敗',
+operationError: '操作エラー'
+},
+ko: {
+pageTitle: 'XYL 토큰',
+connectWallet: '지갑 연결',
+disconnectWallet: '연결 해제',
+tabHome: '홈',
+tabLock: '잠금',
+tabReferral: '추천',
+tabInfo: '내 정보',
+phaseProgress: '단계 진행',
+phase1: '단계 1',
+phase2: '단계 2',
+phase3: '단계 3',
+reward1Percent: '1% 보상',
+reward3Percent: '3% 보상',
+reward5Percent: '5% 보상',
+currentPhaseRewardDesc: '현재 단계 보상 설명',
+tier: '등급',
+superiorThreshold: '상위门槛',
+subordinateThreshold: '하위门槛',
+tierOne: '등급 1',
+tierTwo: '등급 2',
+tierThree: '등급 3',
+threshold300M: '300만',
+threshold150M: '150만',
+threshold80M: '80만',
+threshold50M: '50만',
+threshold10M: '10만',
+contractData: '컨트랙트 데이터',
+burnedAmount: '소각량',
+circulatingSupply: '순환 공급량',
+lockData: '잠금',
+projectData: '프로젝트 데이터',
+referralLink: '추천 링크',
+copyLink: '복사',
+bindReferrer: '바인드',
+referralLinkPlaceholder: '추천 링크',
+referrerPlaceholder: '추천인 주소 입력',
+referralRewardClaim: '추천 보상 청구',
+refreshAll: '모두 새로고침',
+claimAll: '모두 청구',
+noDownline: '하위 사용자 없음',
+notQualified: '미달',
+claimable: '청구 가능',
+claimedAll: '청구 완료',
+myWallet: '내 지갑',
+tokenBalance: '토큰 잔액',
+totalDexBuy: '총 DEX 구매',
+holdStatus: '보유 상태',
+currentHoldThreshold: '현재 보유门槛',
+holdStartTime: '보유 시작 시간',
+unlockTime24h: '24시간 잠금 해제 시간',
+userPhase: '사용자 단계',
+refreshInfo: '새로고침 정보',
+lastRefresh: '마지막 새로고침',
+nextRefresh: '다음 새로고침',
+confirm: '확인',
+installWallet: 'MetaMask, TokenPocket 또는 다른 Web3 지갑을 설치해 주세요',
+switchToBSC: 'BSC 메인넷으로 수동 전환해 주세요',
+autoBindReferrer: '추천인 자동 바인드 중...',
+bindSuccess: '추천인 바인딩 성공!',
+connectFirst: '먼저 지갑을 연결해 주세요',
+copySuccess: '복사 성공!',
+bindSuccessToast: '바인딩 성공!',
+waitToRefresh: '{minutes}분 후에 새로고침해 주세요',
+waitToClaim: '{minutes}분 후에 청구해 주세요',
+noDownlineToClaim: '청구할 하위 사용자가 없습니다',
+startClaiming: '원클릭 청구 시작...',
+userCancelled: '사용자가 서명을 취소하여 청구 중지',
+noClaimableReward: '현재 청구 가능한 보상이 없습니다',
+downline: '하위',
+tierClaim: '등급',
+claimSuccess: '청구 성공',
+claimFailed: '실패',
+operationError: '작업 오류'
+},
+vi: {
+pageTitle: 'XYL Token',
+connectWallet: 'Kết nối Ví',
+disconnectWallet: 'Ngắt kết nối',
+tabHome: 'Trang chủ',
+tabLock: 'Khóa',
+tabReferral: 'Giới thiệu',
+tabInfo: 'Của tôi',
+phaseProgress: 'Tiến độ Giai đoạn',
+phase1: 'Giai đoạn 1',
+phase2: 'Giai đoạn 2',
+phase3: 'Giai đoạn 3',
+reward1Percent: '1% Phần thưởng',
+reward3Percent: '3% Phần thưởng',
+reward5Percent: '5% Phần thưởng',
+currentPhaseRewardDesc: 'Mô tả Phần thưởng Giai đoạn Hiện tại',
+tier: 'Cấp bậc',
+superiorThreshold: 'Ngưỡng cấp trên',
+subordinateThreshold: 'Ngưỡng cấp dưới',
+tierOne: 'Cấp 1',
+tierTwo: 'Cấp 2',
+tierThree: 'Cấp 3',
+threshold300M: '3M',
+threshold150M: '1.5M',
+threshold80M: '800K',
+threshold50M: '500K',
+threshold10M: '100K',
+contractData: 'Dữ liệu Hợp đồng',
+burnedAmount: 'Lượng đốt',
+circulatingSupply: 'Nguồn cung lưu thông',
+lockData: 'Khóa',
+projectData: 'Dữ liệu Dự án',
+referralLink: 'Liên kết Giới thiệu',
+copyLink: 'Sao chép',
+bindReferrer: 'Liên kết',
+referralLinkPlaceholder: 'Liên kết Giới thiệu',
+referrerPlaceholder: 'Nhập địa chỉ người giới thiệu',
+referralRewardClaim: 'Nhận Phần thưởng Giới thiệu',
+refreshAll: 'Làm mới tất cả',
+claimAll: 'Nhận tất cả',
+noDownline: 'Không có cấp dưới',
+notQualified: 'Chưa đạt',
+claimable: 'Có thể nhận',
+claimedAll: 'Đã nhận hết',
+myWallet: 'Ví của tôi',
+tokenBalance: 'Số dư Token',
+totalDexBuy: 'Tổng mua DEX',
+holdStatus: 'Trạng thái nắm giữ',
+currentHoldThreshold: 'Ngưỡng nắm giữ hiện tại',
+holdStartTime: 'Thời gian bắt đầu nắm giữ',
+unlockTime24h: 'Thời gian mở khóa 24h',
+userPhase: 'Giai đoạn người dùng',
+refreshInfo: 'Thông tin làm mới',
+lastRefresh: 'Lần làm mới trước',
+nextRefresh: 'Lần làm mới tiếp',
+confirm: 'Xác nhận',
+installWallet: 'Vui lòng cài đặt MetaMask, TokenPocket hoặc ví Web3 khác',
+switchToBSC: 'Vui lòng chuyển sang BSC Mainnet thủ công',
+autoBindReferrer: 'Đang tự động liên kết người giới thiệu...',
+bindSuccess: 'Liên kết người giới thiệu thành công!',
+connectFirst: 'Vui lòng kết nối ví trước',
+copySuccess: 'Sao chép thành công!',
+bindSuccessToast: 'Liên kết thành công!',
+waitToRefresh: 'Vui lòng đợi {minutes} phút trước khi làm mới',
+waitToClaim: 'Vui lòng đợi {minutes} phút trước khi nhận',
+noDownlineToClaim: 'Không có cấp dưới để nhận',
+startClaiming: 'Bắt đầu nhận tất cả một lần...',
+userCancelled: 'Người dùng hủy ký, dừng nhận',
+noClaimableReward: 'Hiện không có phần thưởng có thể nhận',
+downline: 'cấp dưới',
+tierClaim: 'cấp',
+claimSuccess: 'Nhận thành công',
+claimFailed: 'Thất bại',
+operationError: 'Lỗi thao tác'
+},
+th: {
+pageTitle: 'XYL Token',
+connectWallet: 'เชื่อมต่อกระเป๋า',
+disconnectWallet: 'ตัดการเชื่อมต่อ',
+tabHome: 'หน้าแรก',
+tabLock: 'ล็อก',
+tabReferral: 'แนะนำ',
+tabInfo: 'ของฉัน',
+phaseProgress: 'ความคืบหน้าของระยะ',
+phase1: 'ระยะ 1',
+phase2: 'ระยะ 2',
+phase3: 'ระยะ 3',
+reward1Percent: '1% รางวัล',
+reward3Percent: '3% รางวัล',
+reward5Percent: '5% รางวัล',
+currentPhaseRewardDesc: 'รายละเอียดรางวัลระยะปัจจุบัน',
+tier: 'ระดับ',
+superiorThreshold: 'เกณฑ์ระดับบน',
+subordinateThreshold: 'เกณฑ์ระดับล่าง',
+tierOne: 'ระดับ 1',
+tierTwo: 'ระดับ 2',
+tierThree: 'ระดับ 3',
+threshold300M: '3M',
+threshold150M: '1.5M',
+threshold80M: '800K',
+threshold50M: '500K',
+threshold10M: '100K',
+contractData: 'ข้อมูลสัญญา',
+burnedAmount: 'จำนวนเผา',
+circulatingSupply: 'อุปทานหมุนเวียน',
+lockData: 'ล็อก',
+projectData: 'ข้อมูลโปรเจกต์',
+referralLink: 'ลิงก์แนะนำ',
+copyLink: 'คัดลอก',
+bindReferrer: 'เชื่อมโยง',
+referralLinkPlaceholder: 'ลิงก์แนะนำ',
+referrerPlaceholder: 'ใส่ที่อยู่ผู้แนะนำ',
+referralRewardClaim: 'รับรางวัลแนะนำ',
+refreshAll: 'รีเฟรชทั้งหมด',
+claimAll: 'รับทั้งหมด',
+noDownline: 'ไม่มีระดับล่าง',
+notQualified: 'ไม่ผ่าน',
+claimable: 'รับได้',
+claimedAll: 'รับแล้ว',
+myWallet: 'กระเป๋าของฉัน',
+tokenBalance: 'ยอด Token',
+totalDexBuy: 'ซื้อ DEX รวม',
+holdStatus: 'สถานะถือ',
+currentHoldThreshold: 'เกณฑ์ถือปัจจุบัน',
+holdStartTime: 'เวลาเริ่มถือ',
+unlockTime24h: 'เวลาปลดล็อก 24 ชม.',
+userPhase: 'ระดับผู้ใช้',
+refreshInfo: 'ข้อมูลรีเฟรช',
+lastRefresh: 'รีเฟรชล่าสุด',
+nextRefresh: 'รีเฟรชครั้งต่อไป',
+confirm: 'ยืนยัน',
+installWallet: 'กรุณาติดตั้ง MetaMask, TokenPocket หรือกระเป๋า Web3 อื่น',
+switchToBSC: 'กรุณาสลับเป็น BSC Mainnet ด้วยตัวเอง',
+autoBindReferrer: 'กำลังเชื่อมโยงผู้แนะนำอัตโนมัติ...',
+bindSuccess: 'เชื่อมโยงผู้แนะนำสำเร็จ!',
+connectFirst: 'กรุณาเชื่อมต่อกระเป๋าก่อน',
+copySuccess: 'คัดลอกสำเร็จ!',
+bindSuccessToast: 'เชื่อมโยงสำเร็จ!',
+waitToRefresh: 'กรุณารอ {minutes} นาทีก่อนรีเฟรช',
+waitToClaim: 'กรุณารอ {minutes} นาทีก่อนรับ',
+noDownlineToClaim: 'ไม่มีระดับล่างที่จะรับ',
+startClaiming: 'เริ่มรับทั้งหมดในคลิกเดียว...',
+userCancelled: 'ผู้ใช้ยกเลิกการลงนาม หยุดรับ',
+noClaimableReward: 'ไม่มีรางวัลที่รับได้ในขณะนี้',
+downline: 'ระดับล่าง',
+tierClaim: 'ระดับ',
+claimSuccess: 'รับสำเร็จ',
+claimFailed: 'ล้มเหลว',
+operationError: 'ข้อผิดพลาดการทำงาน'
+}
+};
+
+let currentLang = localStorage.getItem('xyl_lang') || 'zh';
+
+function t(key) {
+const langData = I18N[currentLang] || I18N.zh;
+return langData[key] || key;
+}
+
+function setLanguage(lang) {
+currentLang = lang;
+localStorage.setItem('xyl_lang', lang);
+applyTranslations();
+}
+
+function applyTranslations() {
+document.title = t('pageTitle');
+document.querySelectorAll('[data-i18n]').forEach(el => {
+const key = el.getAttribute('data-i18n');
+el.textContent = t(key);
+});
+}
 
 let web3;
 let account;
@@ -1297,8 +1841,14 @@ showToast(`请等待 ${remaining} 分钟后再领取`, 'error');
 return;
 }
 
-document.getElementById('claimLog').style.display = 'block';
+const claimLog = document.getElementById('claimLog');
+claimLog.style.display = 'block';
 document.getElementById('logContent').innerHTML = '';
+
+if (window.logTimeout) clearTimeout(window.logTimeout);
+window.logTimeout = setTimeout(() => {
+claimLog.style.display = 'none';
+}, 5000);
 
 try {
 const downlines = await mainContract.methods.downlines(account).call();
@@ -1451,6 +2001,13 @@ function translateError(err) {
 }
 
 window.addEventListener('load', async () => {
+const savedLang = localStorage.getItem('xyl_lang');
+if (savedLang) {
+currentLang = savedLang;
+document.getElementById('langSelect').value = savedLang;
+}
+applyTranslations();
+
 if (typeof window.ethereum !== 'undefined') {
 const accounts = await window.ethereum.request({ method: 'eth_accounts' });
 if (accounts.length > 0) {
